@@ -9,17 +9,17 @@ This repository is based on [nanoAOD-tools](https://github.com/cms-nanoAOD/nanoA
 In principle, nanoAOD-tools can be installed independently from CMSSW, but we need an installation within CMSSW here for CRAB submission.
 To install nanoAOD-tools in the correct way:
 
-`cd $CMSSW_BASE/src
-git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
-cmsenv
-scram b`
+    cd $CMSSW_BASE/src  
+    git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools  
+    cmsenv  
+    scram b
 
 Next, install this repository in a similar way:
 
-`cd $CMSSW_BASE/src
-git clone https://github.com/?.git PhysicsTools/nanoSkimming
-cmsenv
-scram b`
+    cd $CMSSW_BASE/src
+    git clone https://github.com/GhentAnalysis/nanoSkimming.git PhysicsTools/nanoSkimming  
+    cmsenv
+    scram b
 
 Finally, make some local changes as discussed in a paragraph below. (Yes, this is not ideal, but a better solution is still to be found.)
 
@@ -50,9 +50,15 @@ You can write your own nanoAOD-tools modules and add them to the skimming workfl
 - When you module uses external data (e.g. json files with extra info or ROOT files with weights), these extra files must be placed in the `data` directory of this repository (or its subdirectories). This is needed since this directory will be copied to the working directory in CRAB submission. This also affects the relative path to access these files, which is different when running locally than when using CRAB submission. See `python/processing/triggervariables.py` or `python/processing/topleptonmva.py` for examples of how to deal with this.
 
 ### References:
-- https://github.com/UBParker/skimNanoAOD/tree/master
-- https://github.com/cms-nanoAOD/nanoAOD-tools
-- https://github.com/cms-nanoAOD/nanoAOD-tools/tree/master/crab
+nanoAOD-tools:
+- https://github.com/cms-nanoAOD/nanoAOD-tools  
+
+Skimming of nanoAOD files:  
+- https://github.com/UBParker/skimNanoAOD/tree/master  
+- https://github.com/cms-nanoAOD/nanoAOD-tools/tree/master/crab  
+
+Useful in general: the branch content of nanoAOD files:  
+- https://cms-nanoaod-integration.web.cern.ch/autoDoc/  
 
 ### Tracking log of changes in third-party source code
 - nanoAOD-tools/python/postprocessing/framework/crabhelper.py
