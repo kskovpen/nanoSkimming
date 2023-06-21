@@ -65,7 +65,7 @@ if __name__=='__main__':
     # make the command
     cmd = 'python3 monitor.py'
     cmd += ' --crabdir {}'.format(args.crabdir)
-    if args.resubmit: cmd += ' --resubmit {}'.format(args.resubmit)
+    if args.resubmit: cmd += ' --resubmit'
     cmd += ' --webpage {}'.format(args.webpage)
 
     # loop

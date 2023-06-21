@@ -2,6 +2,7 @@
 **__pycache__**
 # ignore CRAB logs
 crabsubmission/crablogs*
+crabsubmission/crab.log
 # ignore proxy
 **x509**
 # ignore sample lists
