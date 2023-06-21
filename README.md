@@ -42,6 +42,8 @@ Also the bash script `crabrun.py` should not be modified; it is automatically cr
 #### Monitoring the progress
 Some utility scripts are available to monitor the progress of CRAB jobs.
 These scripts are essentially wrappers around the `crab status` command with a more convenient overview of the output. See `crabsubmission/monitoring` and the comments at the top of each script in there.
+#### Merging
+When all CRAB skimming jobs are finished, the resulting samples can be merged into a single file per sample, using the `mergesamples.py` script in the `merging` directory. Run with `python3 mergesamples.py -h` to see a list of available command line options. This script is essentially a wrapper around `haddnano.py` (from NanoAOD-tools). It can be run sequentially/locally as well as in parallel / via HTCondor on the local cluster.
 
 ### Making changes
 You can write your own nanoAOD-tools modules and add them to the skimming workflow to customize the output. When you do this, there are some things to take into account:
