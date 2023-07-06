@@ -1,18 +1,27 @@
 #!/usr/bin/env python
 
-#####################################
-# Testing script for json selection #
-#####################################
+##########################################
+# Testing script using the full workflow #
+##########################################
 
 # imports
 import os, sys
 import argparse
+import ROOT
+from pathlib import Path
+ROOT.PyConfig.IgnoreCommandLineOptions = True # (?)
 
 # import tools from NanoAODTools
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 
 # import local tools
-from PhysicsTools.nanoSkimming.skimselection.jsonskimmer import JsonSkimmer
+sys.path.append(str(Path(__file__).parents[2]))
+from data.lumijsons.lumijsons import getlumijson
+from PhysicsTools.nanoSkimming.skimselection.multilightleptonskimmer import MultiLightLeptonSkimmer
+from PhysicsTools.nanoSkimming.processing.leptonvariables import LeptonVariablesModule
+from PhysicsTools.nanoSkimming.processing.topleptonmva import TopLeptonMvaModule
+from PhysicsTools.nanoSkimming.processing.leptongenvariables import LeptonGenVariablesModule
+from PhysicsTools.nanoSkimming.processing.triggervariables import TriggerVariablesModule
 from PhysicsTools.nanoSkimming.tools.sampletools import getsampleparams
 
 # input arguments
@@ -38,13 +47,17 @@ year = sampleparams['year']
 dtype = sampleparams['dtype']
 print('Sample is found to be {} {}.'.format(year,dtype))
 
-# define json preskim
-jsonfile = '../data/lumijsons/lumijson_{}.json'.format(year)
-
 # define modules
 modules = ([
-  JsonSkimmer(year=year)
+  MultiLightLeptonSkimmer(
+    electron_selection_id='run2ul_loose',
+    muon_selection_id='run2ul_loose'
+  ),
+  LeptonVariablesModule(),
+  TopLeptonMvaModule(year, 'ULv1'),
+  TriggerVariablesModule(year)
 ])
+if dtype!='data': modules.append(LeptonGenVariablesModule())
 
 # set input files
 inputfiles = [args.inputfile]
@@ -56,7 +69,6 @@ postfix = '-skimmed'
 p = PostProcessor(
   args.outputdir,
   inputfiles,
-  jsonInput = jsonfile,
   modules = modules,
   maxEntries = None if args.nentries < 0 else args.nentries,
   postfix = postfix,
