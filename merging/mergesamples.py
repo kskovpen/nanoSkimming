@@ -1,12 +1,20 @@
 ################################################
 # Merge skimmed files into one file per sample #
 ################################################
+
 # This functionality is supposed to be run on the output of a skimming job with CRAB,
 # see the crabsubmission folder for more info.
+# The input folder for this step is supposed to have the following structure:
+# <top input directory>/<sample name>/<request name>/<timestamp>/<counter>/<skimmed files>
+# The output will look like this:
+# <top output directory>/<merged sample files>
+# where there is one merged sample file per <sample name> and <request name>.
+
 # Note: the merging is done using simple haddnano.py; 
-# it results in one file per sample / primary dataset.
+# it results in one file per sample / primary dataset and era.
 # For merging different primary datasets together,
-# another procedure involving removal of duplicate events should be employed.
+# another procedure involving removal of duplicate events should be employed
+# after running the mergesamples step: see mergedatasets.py.
 
 # import python library classes 
 import os
@@ -50,7 +58,7 @@ def get_files_to_merge( sample_directory, usewildcard=True ):
         if usewildcard:
             mergefiles.append(os.path.join(counter_directory,'*.root'))
         else:
-            files = sorted([f for f in counter_directory if f.endswith('.root')])
+            files = sorted([f for f in os.listdir(counter_directory) if f.endswith('.root')])
             for f in files: mergefiles.append(os.path.join(counter_directory,f))
     return mergefiles
 
@@ -103,6 +111,10 @@ if __name__ == '__main__':
         raise Exception('ERROR: output file {} defined multiple times.'.format(outputfile))
     # add to the merging dict
     mergedict[outputfile] = {'dir': sample_directory, 'files': mfiles, 'nfiles': nmfiles}
+    # do printouts for testing
+    #print(sample_directory)
+    #print(mfiles)
+    #print(nmfiles)
 
   # check if found anything
   if len(mergedict)==0:
