@@ -76,15 +76,17 @@ if not os.path.exists(dropbranches):
     raise Exception('ERROR: dropbranches file not found.')
 
 # define modules
+leptonmodule = None
+if dtype=='data':
+    leptonmodule = nLightLeptonSkimmer(2,
+      electron_selection_id='run2ul_loose',
+      muon_selection_id='run2ul_loose')
+else:
+    leptonmodule = MultiLightLeptonSkimmer(
+      electron_selection_id='run2ul_loose',
+      muon_selection_id='run2ul_loose')
 modules = ([
-  #MultiLightLeptonSkimmer(
-  #  electron_selection_id='run2ul_loose',
-  #  muon_selection_id='run2ul_loose'
-  #),
-  nLightLeptonSkimmer(2,
-    electron_selection_id='run2ul_loose',
-    muon_selection_id='run2ul_loose'
-  ),
+  leptonmodule,
   LeptonVariablesModule(),
   TopLeptonMvaModule(year, 'ULv1'),
   TriggerVariablesModule(year)

@@ -62,8 +62,10 @@ config.JobType.numCores                = 1
 
 config.section_('Data')
 config.Data.inputDataset               = dataset
-config.Data.unitsPerJob                = 1 if 'SIM' in dataset else 40
-config.Data.splitting                  = 'FileBased' if 'SIM' in dataset else 'LumiBased'
+config.Data.unitsPerJob                = 1 if 'SIM' in dataset else 1
+config.Data.splitting                  = 'FileBased'
+# (note: "LumiBased" splitting does not seem to work correctly for NanoAOD data,
+#  perhaps because CRAB cannot extract the lumi number from the NanoAOD format)
 config.Data.outLFNDirBase              = outLFNDirBase
 config.Data.publication                = False
 config.Data.lumiMask                   = None
