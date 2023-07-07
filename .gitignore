@@ -1,5 +1,7 @@
 # ignore cached python folders
 **__pycache__**
+# ignore compiled python
+**.pyc
 # ignore CRAB logs
 crabsubmission/crablogs*
 crabsubmission/crab.log
