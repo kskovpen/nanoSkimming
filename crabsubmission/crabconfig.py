@@ -59,6 +59,9 @@ config.JobType.sendExternalFolder      = True
 config.JobType.sendPythonFolder        = True
 config.JobType.allowUndistributedCMSSW = True
 config.JobType.numCores                = 1
+config.JobType.maxJobRuntimeMin        = 1315 if 'SIM' in dataset else 2630
+# (note: default is 1315, which appears to be slightly too short
+#  for some data files, so used double runtime limit here)
 
 config.section_('Data')
 config.Data.inputDataset               = dataset
