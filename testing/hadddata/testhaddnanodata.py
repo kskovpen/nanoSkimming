@@ -18,8 +18,9 @@ output_path = sys.argv[1]
 # read input files
 input_paths = sys.argv[2:]
 
-# for quicker testing: read only the index branches
-keep_branches = ["event", "run", "luminosityBlock"]
+# for quicker testing: read only the index branches + a few others
+#keep_branches = None
+keep_branches = ["event", "run", "luminosityBlock", "nMuon", "nElectron"]
 
 # perform the hadding
 haddnanodata(
@@ -27,4 +28,4 @@ haddnanodata(
     input_paths,
     verbose=True,
     keep_branches=keep_branches,
-    force=True)
+    force=True )

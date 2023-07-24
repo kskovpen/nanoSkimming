@@ -34,7 +34,7 @@ if __name__ == '__main__':
     raise Exception('ERROR: input directory {} does not exist.'.format(args.inputdir))
 
   # find data files in input directory
-  datafiles = os.listdir(args.inputdir)
+  datafiles = [f for f in os.listdir(args.inputdir) if f.endswith('.root')]
   datafiles = [f for f in datafiles if getsampleparams(f)['dtype']=='data']
   print('Found following data files in input directory:')
   print(datafiles)
@@ -69,8 +69,11 @@ if __name__ == '__main__':
   for outputfile, inputfiles in sorted(mergedict.items()):
     # make the command
     cmd = 'python3 haddnanodata.py'
-    cmd += ' {}'.format(outputfile)
+    cmd += ' -o {}'.format(outputfile)
+    cmd += ' -i'
     for f in inputfiles: cmd += ' {}'.format(f)
+    cmd += ' -v -f'
+    #cmd += ' --test' # only for testing
     # make output directory if needed
     outputdir = os.path.dirname(outputfile)
     if not os.path.exists(outputdir): os.makedirs(outputdir)
