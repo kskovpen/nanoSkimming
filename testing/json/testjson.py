@@ -19,6 +19,7 @@ from PhysicsTools.nanoSkimming.tools.sampletools import getsampleparams
 parser = argparse.ArgumentParser(description='Test')
 parser.add_argument('-i', '--inputfile', required=True)
 parser.add_argument('-o', '--outputdir', required=True, type=os.path.abspath)
+parser.add_argument('-j', '--json', default='auto')
 parser.add_argument('-n', '--nentries', type=int, default=-1)
 parser.add_argument('-d', '--dropbranches', default=None)
 args = parser.parse_args()
@@ -39,11 +40,12 @@ dtype = sampleparams['dtype']
 print('Sample is found to be {} {}.'.format(year,dtype))
 
 # define json preskim
-jsonfile = '../../data/lumijsons/lumijson_{}.json'.format(year)
+if args.json=='auto':
+    args.json = '../../data/lumijsons/lumijson_{}.json'.format(year)
 
 # define modules
 modules = ([
-  JsonSkimmer(year=year)
+  #JsonSkimmer(year=year)
 ])
 
 # set input files
@@ -56,7 +58,7 @@ postfix = '-skimmed'
 p = PostProcessor(
   args.outputdir,
   inputfiles,
-  jsonInput = jsonfile,
+  jsonInput = args.json,
   modules = modules,
   maxEntries = None if args.nentries < 0 else args.nentries,
   postfix = postfix,
