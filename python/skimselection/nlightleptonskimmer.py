@@ -15,6 +15,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 # import local tools
 from PhysicsTools.nanoSkimming.objectselection.electronselection import electronselection
 from PhysicsTools.nanoSkimming.objectselection.muonselection import muonselection
+import PhysicsTools.nanoSkimming.tools.printtools as printtools
 
 
 class nLightLeptonSkimmer(Module):
@@ -35,7 +36,7 @@ class nLightLeptonSkimmer(Module):
         print('Initialized an nLightLeptonSkimmer module with following parameters:')
         print('  - number of leptons threshold: {}'.format(self.n))
         print('  - electron selection ID: {}'.format(self.electron_selection_id))
-        print('  - muon selection ID: '.format(self.muon_selection_id))
+        print('  - muon selection ID: {}'.format(self.muon_selection_id))
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass

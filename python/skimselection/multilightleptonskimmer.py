@@ -34,7 +34,7 @@ class MultiLightLeptonSkimmer(Module):
         self.muon_selection_id = muon_selection_id
         print('Initialized a MultiLightLeptonSkimmer module with following parameters:')
         print('  - electron selection ID: {}'.format(self.electron_selection_id))
-        print('  - muon selection ID: '.format(self.muon_selection_id))
+        print('  - muon selection ID: {}'.format(self.muon_selection_id))
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass

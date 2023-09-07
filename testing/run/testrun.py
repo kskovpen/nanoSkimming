@@ -18,6 +18,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import Pos
 sys.path.append(str(Path(__file__).parents[2]))
 from data.lumijsons.lumijsons import getlumijson
 from PhysicsTools.nanoSkimming.skimselection.multilightleptonskimmer import MultiLightLeptonSkimmer
+from PhysicsTools.nanoSkimming.skimselection.nlightleptonskimmer import nLightLeptonSkimmer
 from PhysicsTools.nanoSkimming.processing.leptonvariables import LeptonVariablesModule
 from PhysicsTools.nanoSkimming.processing.topleptonmva import TopLeptonMvaModule
 from PhysicsTools.nanoSkimming.processing.leptongenvariables import LeptonGenVariablesModule
@@ -30,6 +31,7 @@ parser.add_argument('-i', '--inputfile', required=True)
 parser.add_argument('-o', '--outputdir', required=True, type=os.path.abspath)
 parser.add_argument('-n', '--nentries', type=int, default=-1)
 parser.add_argument('-d', '--dropbranches', default=None)
+parser.add_argument('-j', '--json', default=None)
 args = parser.parse_args()
 
 # parse input file
@@ -49,15 +51,18 @@ print('Sample is found to be {} {}.'.format(year,dtype))
 
 # define modules
 modules = ([
-  MultiLightLeptonSkimmer(
-    electron_selection_id='run2ul_loose',
-    muon_selection_id='run2ul_loose'
-  ),
-  LeptonVariablesModule(),
-  TopLeptonMvaModule(year, 'ULv1'),
-  TriggerVariablesModule(year)
+  #MultiLightLeptonSkimmer(
+  #  electron_selection_id='run2ul_loose',
+  #  muon_selection_id='run2ul_loose'
+  #),
+  nLightLeptonSkimmer(2,
+      electron_selection_id='run2ul_loose',
+      muon_selection_id='run2ul_loose')
+  #LeptonVariablesModule(),
+  #TopLeptonMvaModule(year, 'ULv1'),
+  #TriggerVariablesModule(year)
 ])
-if dtype!='data': modules.append(LeptonGenVariablesModule())
+#if dtype!='data': modules.append(LeptonGenVariablesModule())
 
 # set input files
 inputfiles = [args.inputfile]
@@ -72,7 +77,8 @@ p = PostProcessor(
   modules = modules,
   maxEntries = None if args.nentries < 0 else args.nentries,
   postfix = postfix,
-  branchsel = args.dropbranches
+  branchsel = args.dropbranches,
+  jsonInput = args.json
 )
 
 # run the PostProcessor
