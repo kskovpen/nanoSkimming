@@ -2,6 +2,19 @@
 # Merge datasets with duplicate event removal #
 ###############################################
 
+# The input folder for this step is supposed to have the following structure:
+# <top input directory>/<merged sample files>
+# The input directory can hold both simulated and data samples;
+# only data samples will be selected for this merging step,
+# using the function getsampleparams (see tools/sampletools.py).
+# The output will look like this:
+# <top output directory>/<merged data samples>
+# where there is one merged data file per era.
+
+# Note: this step can take an unreasonably long time to run.
+# If possible, it may be best to avoid merging datasets at this level,
+# and rather do it after subsequent analysis steps, which much less events remaining.
+
 # import python library classes 
 import os
 import sys
