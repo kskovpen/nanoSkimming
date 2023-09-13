@@ -15,7 +15,7 @@ drop GenVisTau*
 drop GenVtx*
 drop HTXS*
 drop IsoTrack*
-drop L1*
+drop L1_*
 drop L1Reco*
 drop L1simulation*
 drop LHEPart*
