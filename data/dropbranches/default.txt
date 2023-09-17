@@ -2,7 +2,6 @@
 keep * # start with keeping all branches
 drop CaloMET*
 drop ChsMET*
-drop CorrT1METJet*
 drop DeepMETResolutionTune*
 drop DeepMETResponseTune*
 drop FatJet*
@@ -22,7 +21,6 @@ drop LHEPart*
 drop LowPtElectron*
 drop OtherPV*
 drop PuppiMET*
-drop RawMET*
 drop RawPuppiMET*
 drop SV*
 drop SubGenJetAK8*

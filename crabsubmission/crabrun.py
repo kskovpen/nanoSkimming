@@ -9,6 +9,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True # (?)
 # import tools from NanoAODTools
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles
+import PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2 as jme
 
 # import local tools
 from PhysicsTools.nanoSkimming.skimselection.multilightleptonskimmer import MultiLightLeptonSkimmer
@@ -75,6 +76,20 @@ if not os.path.exists(dropbranches):
 if not os.path.exists(dropbranches):
     raise Exception('ERROR: dropbranches file not found.')
 
+# set up JetMET module
+yeardict = {
+  '2016PreVFP': 'UL2016_preVFP',
+  '2016PostVFP': 'UL2016',
+  '2017': 'UL2017',
+  '2018': 'UL2018'
+}
+JetMetCorrector = jme.createJMECorrector(
+  isMC=(dtype=='sim'),
+  dataYear=yeardict[year],
+  jesUncert="Merged",
+  splitJER=False
+)
+
 # define modules
 leptonmodule = None
 if dtype=='data':
@@ -89,7 +104,8 @@ modules = ([
   leptonmodule,
   LeptonVariablesModule(),
   TopLeptonMvaModule(year, 'ULv1'),
-  TriggerVariablesModule(year)
+  TriggerVariablesModule(year),
+  JetMetCorrector()
 ])
 if dtype!='data': modules.append(LeptonGenVariablesModule())
 
