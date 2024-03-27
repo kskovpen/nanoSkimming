@@ -65,6 +65,14 @@ JetMetCorrector = jme.createJMECorrector(
   splitJER=False
 )
 
+# define branches to drop and keep
+dropbranches = '../data/dropbranches/default.txt'
+if not os.path.exists(dropbranches):
+    # for CRAB submission, the data directory is copied to the working directory
+    dropbranches = 'data/dropbranches/default.txt'
+if not os.path.exists(dropbranches):
+    raise Exception('ERROR: dropbranches file not found.')
+
 # define modules
 modules = ([
   nLightLeptonSkimmer(2,
@@ -90,7 +98,7 @@ p = PostProcessor(
   modules = modules,
   maxEntries = None if args.nentries < 0 else args.nentries,
   postfix = postfix,
-  branchsel = args.dropbranches,
+  branchsel = dropbranches,
   jsonInput = args.json
 )
 
