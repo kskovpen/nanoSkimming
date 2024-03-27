@@ -8,7 +8,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 import sys
 import os
 import json
-from pathlib import Path
+# from pathlib import Path
 
 # import nanoAODTools
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection,Object
