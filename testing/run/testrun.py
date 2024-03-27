@@ -8,14 +8,14 @@
 import os, sys
 import argparse
 import ROOT
-from pathlib import Path
+# from pathlib import Path
 ROOT.PyConfig.IgnoreCommandLineOptions = True # (?)
 
 # import tools from NanoAODTools
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 
 # import local tools
-sys.path.append(str(Path(__file__).parents[2]))
+sys.path.append("../../")
 from data.lumijsons.lumijsons import getlumijson
 from PhysicsTools.nanoSkimming.skimselection.multilightleptonskimmer import MultiLightLeptonSkimmer
 from PhysicsTools.nanoSkimming.skimselection.nlightleptonskimmer import nLightLeptonSkimmer
