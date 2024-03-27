@@ -6,6 +6,8 @@
 
 # imports
 import os, sys
+sys.path.append("../../")
+#from data.lumijsons.lumijsons import getlumijson
 import argparse
 import ROOT
 # from pathlib import Path
@@ -15,8 +17,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True # (?)
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 
 # import local tools
-sys.path.append("../../")
-from data.lumijsons.lumijsons import getlumijson
+# sys.path.append("../../")
 from PhysicsTools.nanoSkimming.skimselection.multilightleptonskimmer import MultiLightLeptonSkimmer
 from PhysicsTools.nanoSkimming.skimselection.nlightleptonskimmer import nLightLeptonSkimmer
 from PhysicsTools.nanoSkimming.processing.leptonvariables import LeptonVariablesModule
@@ -60,7 +61,7 @@ yeardict = {
 JetMetCorrector = jme.createJMECorrector(
   isMC=(dtype=='sim'),
   dataYear=yeardict[year],
-  jesUncert="All",
+  jesUncert="Merged",
   splitJER=False
 )
 
