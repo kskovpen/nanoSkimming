@@ -10,6 +10,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True # (?)
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles
 import PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2 as jme
+import PhysicsTools.NanoAODTools.postprocessing.modules.common.muonScaleResProducer as muoncorr
 
 # import local tools
 from PhysicsTools.nanoSkimming.skimselection.multilightleptonskimmer import MultiLightLeptonSkimmer
@@ -78,48 +79,62 @@ if not os.path.exists(dropbranches):
 
 # set up JetMET module
 yeardict = {
-  '2016PreVFP': 'UL2016_preVFP',
-  '2016PostVFP': 'UL2016',
-  '2017': 'UL2017',
-  '2018': 'UL2018'
+    '2016PreVFP': 'UL2016_preVFP',
+    '2016PostVFP': 'UL2016',
+    '2017': 'UL2017',
+    '2018': 'UL2018'
 }
 JetMetCorrector = jme.createJMECorrector(
-  isMC=(dtype=='sim'),
-  dataYear=yeardict[year],
-  jesUncert="Merged",
-  splitJER=False
+    isMC=(dtype=='sim'),
+    dataYear=yeardict[year],
+    jesUncert="Merged",
+    splitJER=False
+)
+
+# set up Muon Rochester corrections module:
+roccor_file = {
+    '2016PreVFP': 'RoccoR2016aUL.txt',
+    '2016PostVFP': 'RoccoR2016bUL.txt',
+    '2017': 'RoccoR2017UL.txt',
+    '2018': 'RoccoR2018UL.txt'
+}
+muonCorrector = muoncorr.muonScaleResProducer(
+    rc_dir="roccor.Run2.v5",
+    rc_corrections=roccor_file[year],
+    dataYear=year
 )
 
 # define modules
 leptonmodule = None
 if dtype=='data':
     leptonmodule = nLightLeptonSkimmer(2,
-      electron_selection_id='run2ul_loose',
-      muon_selection_id='run2ul_loose')
+        electron_selection_id='run2ul_loose',
+        muon_selection_id='run2ul_loose')
 else:
     leptonmodule = MultiLightLeptonSkimmer(
-      electron_selection_id='run2ul_loose',
-      muon_selection_id='run2ul_loose')
+        electron_selection_id='run2ul_loose',
+        muon_selection_id='run2ul_loose')
 modules = ([
-  leptonmodule,
-  LeptonVariablesModule(),
-  TopLeptonMvaModule(year, 'ULv1'),
-  TriggerVariablesModule(year),
-  JetMetCorrector()
+    leptonmodule,
+    LeptonVariablesModule(),
+    TopLeptonMvaModule(year, 'ULv1'),
+    TriggerVariablesModule(year),
+    JetMetCorrector(),
+    muonCorrector()
 ])
 if dtype!='data': modules.append(LeptonGenVariablesModule())
 
 # define a PostProcessor
 p = PostProcessor(
-  outputdir,
-  inputfiles,
-  modules = modules,
-  maxEntries = None if args.nentries<=0 else args.nentries,
-  branchsel = dropbranches,
-  fwkJobReport = jobreport,
-  haddFileName = haddname,
-  provenance = provenance,
-  jsonInput = jsonfile
+    outputdir,
+    inputfiles,
+    modules = modules,
+    maxEntries = None if args.nentries<=0 else args.nentries,
+    branchsel = dropbranches,
+    fwkJobReport = jobreport,
+    haddFileName = haddname,
+    provenance = provenance,
+    jsonInput = jsonfile
 )
 
 # run the PostProcessor

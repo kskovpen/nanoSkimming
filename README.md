@@ -14,6 +14,19 @@ To install nanoAOD-tools in the correct way:
     cmsenv  
     scram b
 
+In addition, you need to install the latest Rochester corrections if you want to use these:
+```
+cd $CMSSW_BASE/src/PhysicsTools/NanoAODTools
+cd python/postprocessing/data
+# If a Gitlab SSH token is available:
+git clone ssh://git@gitlab.cern.ch:7999/akhukhun/roccor.git roccor.Run2.v5
+# or using https:
+git clone https://gitlab.cern.ch/akhukhun/roccor.git roccor.Run2.v5
+
+cd roccor.Run2.v5
+git checkout Run2.v5
+```
+
 Next, install this repository in a similar way:
 
     cd $CMSSW_BASE/src
@@ -42,6 +55,9 @@ Also the bash script `crabrun.py` should not be modified; it is automatically cr
 #### Monitoring the progress
 Some utility scripts are available to monitor the progress of CRAB jobs.
 These scripts are essentially wrappers around the `crab status` command with a more convenient overview of the output. See `crabsubmission/monitoring` and the comments at the top of each script in there.
+#### Local submission
+The skimming can also be ran locally on HTCondor.
+-> under construction
 #### Merging
 When all CRAB skimming jobs are finished, the resulting samples can be merged into a single file per sample, using the `mergesamples.py` script in the `merging` directory. Run with `python3 mergesamples.py -h` to see a list of available command line options. This script is essentially a wrapper around `haddnano.py` (from NanoAOD-tools). It can be run sequentially/locally as well as in parallel / via HTCondor on the local cluster.
 
