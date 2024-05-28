@@ -228,6 +228,7 @@ class LeptonGenVariablesModule(Module):
             return 0;
         }
         """
+        if photon is None: return 99
         if photon.pdgId != 22: return 99
         if not (self.genpart_has_status(photon, 'isPrompt') and photon.status == 1): return 2 # this + one more: status()==1 -> check what this is
         if photon.pt < 10: return 1
