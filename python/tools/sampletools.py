@@ -8,22 +8,28 @@ def getsampleparams(sample):
     # perhaps to extend when encountering more 'exotic' sample names...
     years = []
     dtypes = []
-    if 'Run2016' in sample:
-        years.append('2016')
+    if all([tag.lower() in sample.lower() for tag in ['HIPM_UL2016', 'Run2016']]):
+        years.append('2016PreVFP')
         dtypes.append('data')
-    if 'Run2017' in sample:
+    if all([tag.lower() in sample.lower() for tag in ['-UL2016', 'Run2016']]):
+        years.append('2016PreVFP')
+        dtypes.append('data')
+    if all([tag.lower() in sample.lower() for tag in ['UL2017', 'Run2017']]):
         years.append('2017')
         dtypes.append('data')
-    if 'Run2018' in sample:
+    if all([tag.lower() in sample.lower() for tag in ['UL2018', 'Run2018']]):
         years.append('2018')
         dtypes.append('data')
-    if 'RunIISummer20UL16' in sample:
-        years.append('2016')
+    if any([tag.lower() in sample.lower() for tag in ['RunIISummer20UL16APV', 'Run2SIM_UL2016PreVFP', 'PreVFP']]):
+        years.append('2016PreVFP')
         dtypes.append('sim')
-    if 'RunIISummer20UL17' in sample:
+    if any([tag.lower() in sample.lower() for tag in ['RunIISummer20UL16NanoAOD', 'Run2SIM_UL2016PostVFP', 'PostVFP']]):
+        years.append('2016PostVFP')
+        dtypes.append('sim')
+    if any([tag.lower() in sample.lower() for tag in ['RunIISummer20UL17', 'Run2SIM_UL2017']]):
         years.append('2017')
         dtypes.append('sim')
-    if 'RunIISummer20UL18' in sample:
+    if any([tag.lower() in sample.lower() for tag in ['RunIISummer20UL18', 'Run2SIM_UL2018']]):
         years.append('2018')
         dtypes.append('sim')
     if len(set(years))!=1:

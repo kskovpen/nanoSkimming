@@ -14,6 +14,7 @@ import PhysicsTools.NanoAODTools.postprocessing.modules.common.muonScaleResProdu
 # import local tools
 from PhysicsTools.nanoSkimming.skimselection.multilightleptonskimmer import MultiLightLeptonSkimmer
 from PhysicsTools.nanoSkimming.skimselection.nlightleptonskimmer import nLightLeptonSkimmer
+from PhysicsTools.nanoSkimming.processing.psweightsum import PSWeightSumModule
 from PhysicsTools.nanoSkimming.processing.leptonvariables import LeptonVariablesModule
 from PhysicsTools.nanoSkimming.processing.topleptonmva import TopLeptonMvaModule
 from PhysicsTools.nanoSkimming.processing.leptongenvariables import LeptonGenVariablesModule
@@ -38,7 +39,7 @@ for arg in vars(args):
 inputfile = args.inputfile
 inputfiles = [args.inputfile]
 outputdir = os.getenv('TMPDIR')
-
+# outputdir = "/user/nivanden/"
 # get sample parameters
 # (note: no check is done on consistency between samples,
 #  only first sample is used)
@@ -84,7 +85,7 @@ JetMetCorrector = jme.createJMECorrector(
     isMC=(dtype=='sim'),
     dataYear=yeardict[year],
     jesUncert="Merged",
-    splitJER=False
+    splitJER=True
 )
 
 # set up Muon Rochester corrections module:
@@ -112,13 +113,15 @@ else:
         muon_selection_id='run2ul_loose')
 
 # Output modules
+#    leptonmodule,
 modules = ([
+    PSWeightSumModule(),
     leptonmodule,
     LeptonVariablesModule(),
     TopLeptonMvaModule(year, 'ULv1'),
     TriggerVariablesModule(year),
     JetMetCorrector(),
-    muonCorrector()
+    muonCorrector
 ])
 if dtype!='data': modules.append(LeptonGenVariablesModule())
 

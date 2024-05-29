@@ -2,6 +2,7 @@ import glob
 import sys
 import os
 import argparse
+from datetime import datetime
 
 import ct_diff as ct
 
@@ -31,15 +32,20 @@ if __name__ == "__main__":
     # samplelist: pnfs adress basically
     datasets = [dataset.strip() for dataset in open(args.samplelist)]          
     datasets = [dataset.split()[0] for dataset in datasets if dataset and not dataset.startswith('#')] # Clean empty and comment lines
-
     outputbase = args.outputdir
+
+    dateTimeObj = datetime.now()
+    datestring = dateTimeObj.strftime("%Y%m%d_%H%M%S")
 
     for dataset in datasets:
         # dataset is /pnfs path
-
         # decide outputdir:
-        split_dataset = dataset.split("/")[-2] # I think -1, might be -2
-        outputdir = os.path.join(outputbase, split_dataset)
+        # first remove trailing / if it exists:
+        if dataset[-1] == "/":
+            dataset = dataset[:-1]
+        # next, generate outputname
+        split_dataset = dataset.split("/")[-1] # I think -1, might be -2
+        outputdir = os.path.join(outputbase, split_dataset, datestring)
         if not os.path.exists(outputdir):
             os.makedirs(outputdir)
 
@@ -54,12 +60,13 @@ if __name__ == "__main__":
 
         cmds = []
         for file in datasetcontent:
-            cmd = "python3 {}".format(args.processor)
+            cmd = "python {}".format(args.processor)
             cmd += " -i {}".format(file)
             cmd += " -n {}".format(args.nentries)
+            cmds.append(cmd)
 
         # add a default command for copying files from tmpdir to outdir
-        copy_cmd = "cp $TMPDIR/* {}".format(outputdir)
+        copy_cmd = "cp $TMPDIR/* {}/".format(outputdir)
 
         batched = []
         batchsize = args.batchsize
@@ -73,5 +80,5 @@ if __name__ == "__main__":
             batch.append(copy_cmd)
             i += 1
             batched.append(batch)
-
+        # print(batched)
         ct.submitCommandsetsAsCondorCluster("SkimNano", batched, scriptfolder="Scripts/condor/")
