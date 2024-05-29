@@ -15,6 +15,7 @@ import PhysicsTools.NanoAODTools.postprocessing.modules.common.muonScaleResProdu
 # import local tools
 from PhysicsTools.nanoSkimming.skimselection.multilightleptonskimmer import MultiLightLeptonSkimmer
 from PhysicsTools.nanoSkimming.skimselection.nlightleptonskimmer import nLightLeptonSkimmer
+from PhysicsTools.nanoSkimming.processing.psweightsum import PSWeightSumModule
 from PhysicsTools.nanoSkimming.processing.leptonvariables import LeptonVariablesModule
 from PhysicsTools.nanoSkimming.processing.topleptonmva import TopLeptonMvaModule
 from PhysicsTools.nanoSkimming.processing.leptongenvariables import LeptonGenVariablesModule
@@ -114,7 +115,9 @@ else:
     leptonmodule = MultiLightLeptonSkimmer(
         electron_selection_id='run2ul_loose',
         muon_selection_id='run2ul_loose')
+
 modules = ([
+    PSWeightSumModule(),
     leptonmodule,
     LeptonVariablesModule(),
     TopLeptonMvaModule(year, 'ULv1'),
