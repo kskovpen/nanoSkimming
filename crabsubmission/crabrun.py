@@ -47,7 +47,8 @@ outputdir = '.'
 sampleparams = getsampleparams(inputfiles[0])
 year = sampleparams['year']
 dtype = sampleparams['dtype']
-print('Sample is found to be {} {}.'.format(year,dtype))
+runperiod = sampleparams['runperiod']
+print('Sample is found to be {} {} era {}.'.format(year,dtype, runperiod))
 
 # set other parameters
 jobreport = True
@@ -88,8 +89,10 @@ yeardict = {
 JetMetCorrector = jme.createJMECorrector(
     isMC=(dtype=='sim'),
     dataYear=yeardict[year],
+    runPeriod=runperiod,
     jesUncert="Merged",
-    splitJER=False
+    applyHEMfix=True,
+    splitJER=True
 )
 
 # set up Muon Rochester corrections module:
