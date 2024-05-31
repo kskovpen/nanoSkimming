@@ -83,13 +83,19 @@ def makeJobDescription(name, exe, argstring=None, stdout=None, stderr=None, log=
     if log is None:
         log = name + '_$(ClusterId)_$(ProcId).log'
     # write file
+    current_dir = os.getcwd()
+    if not os.path.exists(current_dir + '/condor_logs/'):
+        os.makedirs(current_dir + '/condor_logs/')
+        os.makedirs(current_dir + '/condor_logs/output')
+        os.makedirs(current_dir + '/condor_logs/error')
+        os.makedirs(current_dir + '/condor_logs/logs')
     with open(pathToFname, 'w') as f:
         f.write('executable = {}\n'.format(os.path.join(scriptfolder, exe)))
         if argstring is not None:
             f.write('arguments = "{}"\n\n'.format(argstring))
-        f.write(f"output = /user/{os.environ['USER']}/condor/output/{stdout}\n")
-        f.write(f"error = /user/{os.environ['USER']}/condor/error/{stderr}\n")
-        f.write(f"log = /user/{os.environ['USER']}/condor/logs/{log}\n\n")
+        f.write(f"output = {current_dir}/condor_logs/output/{stdout}\n")
+        f.write(f"error = {current_dir}/condor_logs/error/{stderr}\n")
+        f.write(f"log = {current_dir}/condor_logs/logs/{log}\n\n")
         # f.write('request_cpus = {}\n'.format(cpus)) # Don't specify if not necessary
         # f.write('request_memory = {}\n'.format(mem)) # Don't specify if not necessary
         # f.write('request_disk = {}\n\n'.format(disk)) # Don't specify if not necessary
@@ -106,7 +112,7 @@ def submitCondorJob(jobDescription, addArgs="", scriptfolder=""):
         print('# ERROR #: job description file {} not found'.format(fname))
         sys.exit()
     # maybe later extend this part to account for failed submissions etc!
-    os.system('condor_submit {} {}'.format(fname, addArgs))
+    # os.system('condor_submit {} {}'.format(fname, addArgs))
 
 
 def submitCommandAsCondorJob(name, command, stdout=None, stderr=None, log=None,
