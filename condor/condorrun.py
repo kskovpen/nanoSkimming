@@ -38,8 +38,8 @@ for arg in vars(args):
 # set input files and output directory
 inputfile = args.inputfile
 inputfiles = [args.inputfile]
-# outputdir = os.getenv('TMPDIR')
-outputdir = "/user/nivanden/" # for testing
+outputdir = os.getenv('TMPDIR')
+# outputdir = "/user/nivanden/" # for testing
 # get sample parameters
 # (note: no check is done on consistency between samples,
 #  only first sample is used)
