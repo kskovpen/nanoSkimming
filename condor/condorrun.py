@@ -24,10 +24,13 @@ from PhysicsTools.nanoSkimming.tools.sampletools import getsampleparams
 # read command line arguments
 parser = argparse.ArgumentParser(description='Submission through HTCondor')
 parser.add_argument('-i', '--inputfile', required=True)
-# parser.add_argument('-o', '--outputdir', required=True, type=os.path.abspath)
 parser.add_argument('-n', '--nentries', type=int, default=-1)
+<<<<<<< Updated upstream
 parser.add_argument('-d', '--dropbranches', default='data/dropbranches/fourtops.txt')
 # parser.add_argument('-j', '--json', default=None)
+=======
+parser.add_argument('-d', '--dropbranches', default='../data/dropbranches/fourtops.txt')
+>>>>>>> Stashed changes
 args = parser.parse_args()
 
 # print arguments
@@ -39,7 +42,10 @@ for arg in vars(args):
 inputfile = args.inputfile
 inputfiles = [args.inputfile]
 outputdir = os.getenv('TMPDIR')
-# outputdir = "/user/nivanden/" # for testing
+# note: the os.getenv('TMPDIR') points to the standard working directory
+#       on the HTCondor worker node where this job was submitted.
+#       the copying of the resulting output file to the desired output directory
+#       is handled in the submit script instead!
 # get sample parameters
 # (note: no check is done on consistency between samples,
 #  only first sample is used)
@@ -48,14 +54,6 @@ year = sampleparams['year']
 dtype = sampleparams['dtype']
 runperiod = sampleparams['runperiod']
 print('Sample is found to be {} {} era {}.'.format(year,dtype, runperiod))
-
-# else the jobs seem to fail with error codes pointing to missing job reports)
-haddname = 'skimmed.root'
-# (must be specified if jobreport is True,
-# else there are warnings and unconvenient default values;
-# note that it must correspond to the value in PSet.py and crabconfig.py.)
-provenance = True
-# (seems to take care of copying the MetaData and ParameterSets trees)
 
 # define json preskim
 jsonfile = None
@@ -93,7 +91,7 @@ JetMetCorrector = jme.createJMECorrector(
     splitJER=True
 )
 
-# set up Muon Rochester corrections module:
+# set up muon rochester corrections module:
 roccor_file = {
     '2016PreVFP': 'RoccoR2016aUL.txt',
     '2016PostVFP': 'RoccoR2016bUL.txt',
@@ -106,7 +104,7 @@ muonCorrector = muoncorr.muonScaleResProducer(
     dataYear=year
 )
 
-# Skimmer modules
+# skimmer modules
 leptonmodule = None
 if dtype=='data':
     leptonmodule = nLightLeptonSkimmer(2,
@@ -120,8 +118,8 @@ else:
 year_simple = year
 if "2016" in year_simple:
     year_simple = "2016"  # for trigger variables
-# Output modules
-#    leptonmodule,
+
+# output modules
 modules = ([])
 if dtype != "data":
     modules = ([PSWeightSumModule()])
@@ -134,8 +132,9 @@ modules += ([
     muonCorrector
 ])
 if dtype!='data': modules.append(LeptonGenVariablesModule())
-# set other arguments -> what does this do? <- prob postfix filename. Don't want this, remove
-postfix = ''
+
+# set other arguments
+postfix = '' # (just some naming postfix for output file)
 
 # define a PostProcessor
 p = PostProcessor(

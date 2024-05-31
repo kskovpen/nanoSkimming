@@ -74,9 +74,6 @@ class LeptonGenVariablesModule(Module):
         # get collections of particles for this event
         electrons = Collection(event, "Electron")
         muons = Collection(event, "Muon")
-
-        # Either fill tau with dummys, fix it correctly or just keep ignoring... Not yet decided.
-        # taus = Collection(event, "Tau")
         genparticles = Collection(event, "GenPart")
 
         # do custom matching
@@ -89,8 +86,6 @@ class LeptonGenVariablesModule(Module):
             muon_isprompt = [self.genpart_is_prompt(g) for g in muon_matches]
             self.out.fillBranch('Electron_isPrompt', electron_isprompt)
             self.out.fillBranch('Muon_isPrompt', muon_isprompt)
-            # tau_isprompt = [True for t in taus]
-            # self.out.fillBranch("Tau_isPrompt", tau_isprompt)
 
         # matchPdgId
         if 'matchPdgId' in self.variables:
@@ -98,16 +93,12 @@ class LeptonGenVariablesModule(Module):
             muon_matchpdgid = [(g.pdgId if g is not None else 0) for g in muon_matches]
             self.out.fillBranch('Electron_matchPdgId', electron_matchpdgid)
             self.out.fillBranch('Muon_matchPdgId', muon_matchpdgid)
-            # tau_matchpdgid = [0 for t in taus]
-            # self.out.fillBranch("Tau_matchPdgId", tau_matchpdgid)
 
         if 'provenanceConversion' in self.variables:
             electron_provenance = [self.provenanceconversion(g, genparticles) for g in electron_matches]
             muon_provenance = [self.provenanceconversion(g, genparticles) for g in muon_matches]
             self.out.fillBranch('Electron_provenanceConversion', electron_provenance)
             self.out.fillBranch('Muon_provenanceConversion', muon_provenance)
-            # tau_provenance = [0 for t in taus]
-            # self.out.fillBranch("Tau_provenanceConversion", tau_provenance)
 
         # motherPdgId
         if 'motherPdgId' in self.variables:
@@ -115,8 +106,6 @@ class LeptonGenVariablesModule(Module):
             muon_motherpdgid = [self.motherpdgid(g, genparticles) for g in muon_matches]
             self.out.fillBranch('Electron_motherPdgId', electron_motherpdgid)
             self.out.fillBranch('Muon_motherPdgId', muon_motherpdgid)
-            # tau_motherpdgid = [0 for t in taus]
-            # self.out.fillBranch("Tau_motherPdgId", tau_motherpdgid)
 
         # isChargeFlip
         if 'isChargeFlip' in self.variables:
@@ -130,8 +119,6 @@ class LeptonGenVariablesModule(Module):
                 if g.pdgId==-m.pdgId: muon_ischargeflip[i] = True
             self.out.fillBranch('Electron_isChargeFlip', electron_ischargeflip)
             self.out.fillBranch('Muon_isChargeFlip', muon_ischargeflip)
-            # tau_ischargeflip = [False for t in taus]
-            # self.out.fillBranch("Tau_isChargeFlip", tau_ischargeflip)
 
         return True
 
@@ -209,53 +196,17 @@ class LeptonGenVariablesModule(Module):
         return genmatch
 
     def provenanceconversion(self, photon, genparticles):
-        """
-        Calculated between match and all genparticles.
-        C++ code:
-        unsigned GenTools::provenanceConversion(const reco::GenParticle* photon, const std::vector<reco::GenParticle>& genParticles){
-            //https://hypernews.cern.ch/HyperNews/CMS/get/susy-interpretations/192.html
-            //99: not a photon
-            //0: direct prompt photon (prompt and delta R with ME parton > 0.05)
-            //1: fragmentation photon (prompt and delta R with ME parton < 0.05)
-            //2: non-prompt photon
-            if(!photon or photon->pdgId() != 22) return 99;
-            if(!photon->isPromptFinalState())    return 2;
-            if(photon->pt() < 10)                return 1;
-
-            TLorentzVector photonVec(photon->px(), photon->py(), photon->pz(), photon->energy() );
-            for(auto& parton : genParticles){
-
-                //only compare photon to ME partons
-                if(parton.status() != 23) continue;
-
-                //make sure parton is a parton
-                unsigned partonId = abs( parton.pdgId() );
-                if( ! ( (partonId == 21) || (partonId > 0 && partonId < 7) ) ) continue;
-                
-                //check separation of photon to parton
-                TLorentzVector partonVec(parton.px(), parton.py(), parton.pz(), parton.energy() );
-                if( photonVec.DeltaR(partonVec) < 0.05){
-                    return 1;
-                }
-            }
-            return 0;
-        }
-        """
+        # see https://github.com/GhentAnalysis/heavyNeutrino/blob/
+        # cd101501001e9776b324002da585e38fe0a378d4/multilep/src/GenTools.cc#L191
         if photon is None: return 99
         if photon.pdgId != 22: return 99
-        if not (self.genpart_has_status(photon, 'isPrompt') and photon.status == 1): return 2 # this + one more: status()==1 -> check what this is
+        if not (self.genpart_has_status(photon, 'isPrompt') and photon.status == 1): return 2
         if photon.pt < 10: return 1
-
         for genpart in genparticles:
-            if genpart.status != 23: continue # only compare photon to ME partons
-
-            # make sure it is a parton -> quark or gluon
+            if genpart.status != 23: continue
             partonId = abs(genpart.pdgId)
             if not ( (partonId == 21) or (partonId > 0 and partonId < 7) ): continue
-
-            if photon.DeltaR(genpart) < 0.05:
-                return 1
-            
+            if photon.DeltaR(genpart) < 0.05: return 1
         return 0
 
     def motherpdgid(self, genpart, genparticles):

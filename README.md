@@ -1,8 +1,11 @@
 # Skim nanoAOD files using CRAB
 
 ### Introduction
-This repository can be used to read remote nanoAOD files via DAS, skim them, and write them to a local storage site. 
-The skimming step does not only include selection of interesting events, but also the addition of new variables, so they do not have to be recomputed every time on the fly.
+This repository can be used to read remote nanoAOD files via DAS, skim them,
+and write them to a local storage site. 
+The skimming step does not only include selection of interesting events,
+but also the addition of new variables, so they do not have to be recomputed every time on the fly.
+Optionally, unused branches can be dropped to reduce the required storage space.
 
 ### How to install
 This repository is based on [nanoAOD-tools](https://github.com/cms-nanoAOD/nanoAOD-tools/tree/master), so the first step consists in installing that package.
@@ -45,6 +48,7 @@ cp $CMSSW_BASE/src/PhysicsTools/nanoSkimming/data/JME_fuckups/Summer19UL17_V5_MC
 
 
 ### How to use
+
 #### Local testing
 For quick local tests, go to the `testing` directory.
 The script `testdummy.py` can be used to verify the basic setup, e.g. if nanoAOD-tools can be properly imported.
@@ -52,6 +56,7 @@ Run with `python3 testdummy.py -h` to see the available command line options.
 The script `testrun.py` contains a slightly more involved workflow, with real-world skim conditions and other processing steps.
 Run with `python3 testrun.py -h` to see the available command line options.
 Use this for more advanced tests, or write your own test script based on `testrun.py` for more specific tests.
+
 #### CRAB submission
 Go to the `crabsubmission` directory.
 The main script for CRAB submission is `submit.py`.
@@ -60,12 +65,14 @@ This script basically submits the `crabrun.py` script as jobs to CRAB, where `cr
 Before submission, it is usually a good idea to run `crabrun.py` locally to see if it behaves as expected.
 Important: the file `PSet.py` should not normally be modified, with some exceptions mentioned in the comments at the top of the file.
 Also the bash script `crabrun.py` should not be modified; it is automatically created by `submit.py` upon submission.
+
 #### Monitoring the progress
 Some utility scripts are available to monitor the progress of CRAB jobs.
 These scripts are essentially wrappers around the `crab status` command with a more convenient overview of the output. See `crabsubmission/monitoring` and the comments at the top of each script in there.
+
 #### Local submission
-The skimming can also be ran locally on HTCondor.
--> under construction
+The skimming can also be done on a local cluster (i.e. T2B in our case) with HTCondor. See the `condor` directory for more information.
+
 #### Merging
 When all CRAB skimming jobs are finished, the resulting samples can be merged into a single file per sample, using the `mergesamples.py` script in the `merging` directory. Run with `python3 mergesamples.py -h` to see a list of available command line options. This script is essentially a wrapper around `haddnano.py` (from NanoAOD-tools). It can be run sequentially/locally as well as in parallel / via HTCondor on the local cluster.
 
