@@ -1,10 +1,12 @@
+# Run in python3
+
 import glob
 import sys
 import os
 import argparse
 from datetime import datetime
 
-import ct_diff as ct
+import condortools as ct
 
 
 def hascmsenv():
@@ -20,11 +22,11 @@ if __name__ == "__main__":
                         help='File with dataset names to process -> must be htcondor paths')
     parser.add_argument('-p', '--processor', default='condor/condorrun.py',
                         help='Python script to run on each file')
-    parser.add_argument('-o', '--outputdir', default='/pnfs/iihe/cms/store/user/nivanden/nanoaodskims',
+    parser.add_argument('-o', '--outputdir', default=f'/pnfs/iihe/cms/store/user/{os.getenv("USER")}/nanoaodskims',
                         help='Output directory on /pnfs')
     parser.add_argument('-n', '--nentries', default=-1, type=int,
                         help='Number of entries to process per unit')
-    parser.add_argument('-b', '--batchsize', default=10,
+    parser.add_argument('-b', '--batchsize', default=50,
                         help='Number of files processed in each job.')
     args = parser.parse_args()
 
