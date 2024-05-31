@@ -7,16 +7,16 @@ import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 import sys
 import os
-from pathlib import Path
+# from pathlib import Path
 
 # import nanoAODTools
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection,Object
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 # import local tools
-sys.path.append(str(Path(__file__).parents[1]))
-from objectselection.electronselection import electronselection
-from objectselection.muonselection import muonselection
+# sys.path.append(str(Path(__file__).parents[1]))
+from PhysicsTools.nanoSkimming.objectselection.electronselection import electronselection
+from PhysicsTools.nanoSkimming.objectselection.muonselection import muonselection
 
 
 class MultiLightLeptonSkimmer(Module):

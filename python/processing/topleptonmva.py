@@ -12,7 +12,7 @@ import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 import sys
 import os
-from pathlib import Path
+# from pathlib import Path
 import numpy as np
 import xgboost as xgb
 

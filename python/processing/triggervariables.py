@@ -8,7 +8,6 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 import sys
 import os
 import json
-from pathlib import Path
 
 # import nanoAODTools
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection,Object
@@ -43,9 +42,10 @@ class TriggerVariablesModule(Module):
         for trigger, hlts in self.triggerdefs.items():
             # the elements in hlts are either a string (a single, required trigger path)
             # or a list (of optional trigger paths)
-            required_hlts = [hlt for hlt in hlts if isinstance(hlt,str)]
-            optional_hlts = [hlt for hlt in hlts if not isinstance(hlt,str)]
+            required_hlts = [hlt for hlt in hlts if (isinstance(hlt,str) or isinstance(hlt, unicode))]
+            optional_hlts = [hlt for hlt in hlts if isinstance(hlt, list)]
             available_hlts = required_hlts[:] # will be appended with available optional triggers
+
             # check required triggers
             for hlt in required_hlts:
                 branchname = 'HLT_{}'.format(hlt)

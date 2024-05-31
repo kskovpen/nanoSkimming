@@ -2,7 +2,7 @@
 # Definition of jet selections #
 ################################
 
-def jetelection(jet, selectionid=None):
+def jetselection(jet, selectionid=None):
     ### perform jet selection
     # input arguments:
     # - jet: nanoAODTools jet object

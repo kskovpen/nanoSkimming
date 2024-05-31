@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# Mostly copied from crabrun and testdummy
 
 # imports
 import os, sys
@@ -8,7 +8,6 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True # (?)
 
 # import tools from NanoAODTools
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
-from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles
 import PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2 as jme
 import PhysicsTools.NanoAODTools.postprocessing.modules.common.muonScaleResProducer as muoncorr
 
@@ -22,10 +21,13 @@ from PhysicsTools.nanoSkimming.processing.leptongenvariables import LeptonGenVar
 from PhysicsTools.nanoSkimming.processing.triggervariables import TriggerVariablesModule
 from PhysicsTools.nanoSkimming.tools.sampletools import getsampleparams
 
-
 # read command line arguments
-parser = argparse.ArgumentParser(description='Submit via CRAB')
-parser.add_argument('-n', '--nentries', default=-1, type=int)
+parser = argparse.ArgumentParser(description='Submission through HTCondor')
+parser.add_argument('-i', '--inputfile', required=True)
+# parser.add_argument('-o', '--outputdir', required=True, type=os.path.abspath)
+parser.add_argument('-n', '--nentries', type=int, default=-1)
+parser.add_argument('-d', '--dropbranches', default='../data/dropbranches/fourtops.txt')
+# parser.add_argument('-j', '--json', default=None)
 args = parser.parse_args()
 
 # print arguments
@@ -34,25 +36,19 @@ for arg in vars(args):
     print('  - {}: {}'.format(arg,getattr(args,arg)))
 
 # set input files and output directory
-inputfiles = inputFiles()
-# (this takes care of file providing via CRAB;
-#  when testing locally, this function retrieves the input file defined in PSet.py)
-outputdir = '.'
-# (must be set to current directory for CRAB jobs to run properly;
-#  the actual correct output directory is managed by CRAB)
-
+inputfile = args.inputfile
+inputfiles = [args.inputfile]
+outputdir = os.getenv('TMPDIR')
+# outputdir = "/user/nivanden/" # for testing
 # get sample parameters
 # (note: no check is done on consistency between samples,
 #  only first sample is used)
-sampleparams = getsampleparams(inputfiles[0])
+sampleparams = getsampleparams(inputfile)
 year = sampleparams['year']
 dtype = sampleparams['dtype']
 runperiod = sampleparams['runperiod']
 print('Sample is found to be {} {} era {}.'.format(year,dtype, runperiod))
 
-# set other parameters
-jobreport = True
-# (must be set to True for CRAB submission,
 # else the jobs seem to fail with error codes pointing to missing job reports)
 haddname = 'skimmed.root'
 # (must be specified if jobreport is True,
@@ -72,10 +68,7 @@ if dtype=='data':
         raise Exception('ERROR: json file not found.')
 
 # define branches to drop and keep
-dropbranches = '../data/dropbranches/default.txt'
-if not os.path.exists(dropbranches):
-    # for CRAB submission, the data directory is copied to the working directory
-    dropbranches = 'data/dropbranches/default.txt'
+dropbranches = args.dropbranches
 if not os.path.exists(dropbranches):
     raise Exception('ERROR: dropbranches file not found.')
 
@@ -111,7 +104,7 @@ muonCorrector = muoncorr.muonScaleResProducer(
     dataYear=year
 )
 
-# define modules
+# Skimmer modules
 leptonmodule = None
 if dtype=='data':
     leptonmodule = nLightLeptonSkimmer(2,
@@ -122,6 +115,8 @@ else:
         electron_selection_id='run2ul_loose',
         muon_selection_id='run2ul_loose')
 
+# Output modules
+#    leptonmodule,
 modules = ([])
 if dtype != "data":
     modules = ([PSWeightSumModule()])
@@ -134,16 +129,17 @@ modules += ([
     muonCorrector
 ])
 if dtype!='data': modules.append(LeptonGenVariablesModule())
+# set other arguments -> what does this do? <- prob postfix filename. Don't want this, remove
+postfix = ''
+
 # define a PostProcessor
 p = PostProcessor(
     outputdir,
     inputfiles,
     modules = modules,
     maxEntries = None if args.nentries<=0 else args.nentries,
+    postfix = postfix,
     branchsel = dropbranches,
-    fwkJobReport = jobreport,
-    haddFileName = haddname,
-    provenance = provenance,
     jsonInput = jsonfile
 )
 
