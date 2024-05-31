@@ -122,6 +122,10 @@ else:
         electron_selection_id='run2ul_loose',
         muon_selection_id='run2ul_loose')
 
+year_simple = year
+if "2016" in year_simple:
+    year_simple = "2016" # for trigger variables
+
 modules = ([])
 if dtype != "data":
     modules = ([PSWeightSumModule()])
@@ -129,7 +133,7 @@ modules += ([
     leptonmodule,
     LeptonVariablesModule(),
     TopLeptonMvaModule(year, 'ULv1'),
-    TriggerVariablesModule(year),
+    TriggerVariablesModule(year_simple),
     JetMetCorrector(),
     muonCorrector
 ])
