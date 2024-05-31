@@ -39,7 +39,7 @@ for arg in vars(args):
 inputfile = args.inputfile
 inputfiles = [args.inputfile]
 outputdir = os.getenv('TMPDIR')
-# outputdir = "/user/nivanden/"
+# outputdir = "/user/nivanden/" # for testing
 # get sample parameters
 # (note: no check is done on consistency between samples,
 #  only first sample is used)
@@ -117,9 +117,10 @@ else:
 
 # Output modules
 #    leptonmodule,
-modules = ([
-    PSWeightSumModule(),
-    leptonmodule,
+modules = ([])
+if dtype != "data":
+    modules = ([PSWeightSumModule()])
+modules += ([
     LeptonVariablesModule(),
     TopLeptonMvaModule(year, 'ULv1'),
     TriggerVariablesModule(year),
@@ -127,8 +128,8 @@ modules = ([
     muonCorrector
 ])
 if dtype!='data': modules.append(LeptonGenVariablesModule())
-
-# set other arguments -> what does this do? -< prob postfix filename. Don't want this, remove
+print(modules)
+# set other arguments -> what does this do? <- prob postfix filename. Don't want this, remove
 postfix = ''
 
 # define a PostProcessor
