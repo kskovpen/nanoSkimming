@@ -126,7 +126,7 @@ modules += ([
 ])
 if dtype!='data': modules.append(LeptonGenVariablesModule())
 print(modules)
-# set other arguments -> what does this do? -< prob postfix filename. Don't want this, remove
+# set other arguments -> what does this do? <- prob postfix filename. Don't want this, remove
 postfix = ''
 
 # define a PostProcessor
