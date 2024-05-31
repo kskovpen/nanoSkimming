@@ -86,12 +86,15 @@ yeardict = {
     '2017': 'UL2017',
     '2018': 'UL2018'
 }
+applyhemFix = False
+if year=='2018':
+    applyhemFix = True
 JetMetCorrector = jme.createJMECorrector(
     isMC=(dtype=='sim'),
     dataYear=yeardict[year],
     runPeriod=runperiod,
     jesUncert="Merged",
-    applyHEMfix=True,
+    applyHEMfix=applyhemFix,
     splitJER=True
 )
 

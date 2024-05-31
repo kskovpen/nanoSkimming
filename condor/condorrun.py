@@ -26,7 +26,7 @@ parser = argparse.ArgumentParser(description='Submission through HTCondor')
 parser.add_argument('-i', '--inputfile', required=True)
 # parser.add_argument('-o', '--outputdir', required=True, type=os.path.abspath)
 parser.add_argument('-n', '--nentries', type=int, default=-1)
-# parser.add_argument('-d', '--dropbranches', default=None)
+parser.add_argument('-d', '--dropbranches', default='../data/dropbranches/fourtops.txt')
 # parser.add_argument('-j', '--json', default=None)
 args = parser.parse_args()
 
@@ -68,10 +68,7 @@ if dtype=='data':
         raise Exception('ERROR: json file not found.')
 
 # define branches to drop and keep
-dropbranches = '../data/dropbranches/fourtops.txt'
-if not os.path.exists(dropbranches):
-    # for CRAB submission, the data directory is copied to the working directory
-    dropbranches = 'data/dropbranches/fourtops.txt'
+dropbranches = args.dropbranches
 if not os.path.exists(dropbranches):
     raise Exception('ERROR: dropbranches file not found.')
 
@@ -82,12 +79,15 @@ yeardict = {
     '2017': 'UL2017',
     '2018': 'UL2018'
 }
+applyhemFix = False
+if year=='2018':
+    applyhemFix = True
 JetMetCorrector = jme.createJMECorrector(
     isMC=(dtype=='sim'),
     dataYear=yeardict[year],
     runPeriod=runperiod,
     jesUncert="Merged",
-    applyHEMfix=True,
+    applyHEMfix=applyhemFix,
     splitJER=True
 )
 
