@@ -26,7 +26,7 @@ parser = argparse.ArgumentParser(description='Submission through HTCondor')
 parser.add_argument('-i', '--inputfile', required=True)
 # parser.add_argument('-o', '--outputdir', required=True, type=os.path.abspath)
 parser.add_argument('-n', '--nentries', type=int, default=-1)
-parser.add_argument('-d', '--dropbranches', default='../data/dropbranches/fourtops.txt')
+parser.add_argument('-d', '--dropbranches', default='data/dropbranches/fourtops.txt')
 # parser.add_argument('-j', '--json', default=None)
 args = parser.parse_args()
 
@@ -69,6 +69,8 @@ if dtype=='data':
 
 # define branches to drop and keep
 dropbranches = args.dropbranches
+if not os.path.exists(dropbranches):
+    dropbranches = "../data/dropbranches/fourtops.txt"
 if not os.path.exists(dropbranches):
     raise Exception('ERROR: dropbranches file not found.')
 
@@ -115,6 +117,9 @@ else:
         electron_selection_id='run2ul_loose',
         muon_selection_id='run2ul_loose')
 
+year_simple = year
+if "2016" in year_simple:
+    year_simple = "2016"  # for trigger variables
 # Output modules
 #    leptonmodule,
 modules = ([])
@@ -124,7 +129,7 @@ modules += ([
     leptonmodule,
     LeptonVariablesModule(),
     TopLeptonMvaModule(year, 'ULv1'),
-    TriggerVariablesModule(year),
+    TriggerVariablesModule(year_simple),
     JetMetCorrector(),
     muonCorrector
 ])

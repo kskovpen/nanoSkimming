@@ -36,6 +36,14 @@ Next, install this repository in a similar way:
 
 Finally, make some local changes as discussed in a paragraph below. (Yes, this is not ideal, but a better solution is still to be found.)
 
+To make 2017 run as it should, the JEC version of 2017 has to be replace. Instructions are:
+```
+cd $CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/jme/
+rm Summer19UL17_V5_MC.tgz
+cp $CMSSW_BASE/src/PhysicsTools/nanoSkimming/data/JME_fuckups/Summer19UL17_V5_MC.tar.gz ./Summer19UL17_V5_MC.tgz
+```
+
+
 ### How to use
 #### Local testing
 For quick local tests, go to the `testing` directory.

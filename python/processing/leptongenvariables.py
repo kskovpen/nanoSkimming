@@ -34,7 +34,7 @@ class LeptonGenVariablesModule(Module):
                 raise Exception(msg)
         print('Initialized a LeptonGenVariablesModule with following parameters:')
         print('  - variables:')
-        for var in variables: print('    - {}'.format(var))
+        for var in self.variables: print('    - {}'.format(var))
 
         # define a map of gen particle status codes
         self.statusmap = ({

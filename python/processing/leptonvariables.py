@@ -34,7 +34,7 @@ class LeptonVariablesModule(Module):
                 raise Exception(msg)
         print('Initialized a LeptonVariablesModule with following parameters:')
         print('  - variables:')
-        for var in variables: print('    - {}'.format(var))
+        for var in self.variables: print('    - {}'.format(var))
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree

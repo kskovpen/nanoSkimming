@@ -20,10 +20,10 @@ def getsampleparams(sample):
     if all([tag.lower() in sample.lower() for tag in ['UL2018', 'Run2018']]):
         years.append('2018')
         dtypes.append('data')
-    if any([tag.lower() in sample.lower() for tag in ['RunIISummer20UL16APV', 'Run2SIM_UL2016PreVFP', 'PreVFP']]):
+    if any([tag.lower() in sample.lower() for tag in ['RunIISummer20UL16APV', 'Run2SIM_UL2016PreVFP', 'PreVFP', 'preVFP']]):
         years.append('2016PreVFP')
         dtypes.append('sim')
-    if any([tag.lower() in sample.lower() for tag in ['RunIISummer20UL16NanoAOD', 'Run2SIM_UL2016PostVFP', 'PostVFP']]):
+    if any([tag.lower() in sample.lower() for tag in ['RunIISummer20UL16NanoAOD', 'Run2SIM_UL2016PostVFP', 'Run2SIM_UL2016Mini', 'PostVFP']]):
         years.append('2016PostVFP')
         dtypes.append('sim')
     if any([tag.lower() in sample.lower() for tag in ['RunIISummer20UL17', 'Run2SIM_UL2017']]):
