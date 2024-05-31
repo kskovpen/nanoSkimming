@@ -40,4 +40,20 @@ def getsampleparams(sample):
         msg = 'ERROR: could not determine data type'
         msg += ' for sample {}, found candidates {}'.format(sample, dtypes)
         raise Exception(msg)
-    return {'year': years[0], 'dtype': dtypes[0]}
+    
+    ret = {'year': years[0], 'dtype': dtypes[0]}
+    if ret['dtype'] == 'data':
+        # split on "Run" and take last part
+        runperiod = sample.split("Run")[-1][4]
+        # assert runperiod is a capitalized letter:
+        if not runperiod.isupper():
+            msg = 'ERROR: could not determine run period'
+            msg += ' for sample {}'.format(sample)
+            msg += " Make sure sample name for data follows Run[YEAR][PERIOD] "
+            msg += "format with period a single capital letter for the era."
+            raise Exception(msg)
+        ret['runperiod'] = runperiod
+    else:
+        ret['runperiod'] = "B"
+
+    return ret

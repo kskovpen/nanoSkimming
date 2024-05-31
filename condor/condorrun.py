@@ -46,7 +46,8 @@ outputdir = os.getenv('TMPDIR')
 sampleparams = getsampleparams(inputfile)
 year = sampleparams['year']
 dtype = sampleparams['dtype']
-print('Sample is found to be {} {}.'.format(year,dtype))
+runperiod = sampleparams['runperiod']
+print('Sample is found to be {} {} era {}.'.format(year,dtype, runperiod))
 
 # else the jobs seem to fail with error codes pointing to missing job reports)
 haddname = 'skimmed.root'
@@ -84,7 +85,9 @@ yeardict = {
 JetMetCorrector = jme.createJMECorrector(
     isMC=(dtype=='sim'),
     dataYear=yeardict[year],
+    runPeriod=runperiod,
     jesUncert="Merged",
+    applyHEMfix=True,
     splitJER=True
 )
 
