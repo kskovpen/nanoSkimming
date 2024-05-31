@@ -121,6 +121,7 @@ modules = ([])
 if dtype != "data":
     modules = ([PSWeightSumModule()])
 modules += ([
+    leptonmodule,
     LeptonVariablesModule(),
     TopLeptonMvaModule(year, 'ULv1'),
     TriggerVariablesModule(year),
@@ -128,7 +129,6 @@ modules += ([
     muonCorrector
 ])
 if dtype!='data': modules.append(LeptonGenVariablesModule())
-print(modules)
 # set other arguments -> what does this do? <- prob postfix filename. Don't want this, remove
 postfix = ''
 

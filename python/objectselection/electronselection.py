@@ -27,7 +27,7 @@ def electronselection(electron, selectionid=None):
 # - Kirill's AN on the TOP lepton MVAand AN-2022-016)
 
 def electronid_run2ul_loose(electron):
-    return (electron.pt > 10.
+    return (electron.pt > 7.
             and abs(electron.eta) < 2.5
             and abs(electron.dxy) < 0.05
             and abs(electron.dz) < 0.1

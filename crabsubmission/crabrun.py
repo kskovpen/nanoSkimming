@@ -119,17 +119,18 @@ else:
         electron_selection_id='run2ul_loose',
         muon_selection_id='run2ul_loose')
 
-modules = ([
-    PSWeightSumModule(),
+modules = ([])
+if dtype != "data":
+    modules = ([PSWeightSumModule()])
+modules += ([
     leptonmodule,
     LeptonVariablesModule(),
     TopLeptonMvaModule(year, 'ULv1'),
     TriggerVariablesModule(year),
     JetMetCorrector(),
-    muonCorrector()
+    muonCorrector
 ])
 if dtype!='data': modules.append(LeptonGenVariablesModule())
-
 # define a PostProcessor
 p = PostProcessor(
     outputdir,

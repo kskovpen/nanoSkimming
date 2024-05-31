@@ -30,7 +30,7 @@ def muonid_run2ul_loose(muon):
     return (
         muon.isPFcand
         and (muon.isTracker or muon.isGlobal)
-        and muon.pt > 10.
+        and muon.pt > 7.
         and abs(muon.eta) < 2.4
         and abs(muon.dxy) < 0.05
         and abs(muon.dz) < 0.1

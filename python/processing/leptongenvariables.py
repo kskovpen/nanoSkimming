@@ -74,6 +74,9 @@ class LeptonGenVariablesModule(Module):
         # get collections of particles for this event
         electrons = Collection(event, "Electron")
         muons = Collection(event, "Muon")
+
+        # Either fill tau with dummys, fix it correctly or just keep ignoring... Not yet decided.
+        # taus = Collection(event, "Tau")
         genparticles = Collection(event, "GenPart")
 
         # do custom matching
@@ -86,6 +89,8 @@ class LeptonGenVariablesModule(Module):
             muon_isprompt = [self.genpart_is_prompt(g) for g in muon_matches]
             self.out.fillBranch('Electron_isPrompt', electron_isprompt)
             self.out.fillBranch('Muon_isPrompt', muon_isprompt)
+            # tau_isprompt = [True for t in taus]
+            # self.out.fillBranch("Tau_isPrompt", tau_isprompt)
 
         # matchPdgId
         if 'matchPdgId' in self.variables:
@@ -93,12 +98,16 @@ class LeptonGenVariablesModule(Module):
             muon_matchpdgid = [(g.pdgId if g is not None else 0) for g in muon_matches]
             self.out.fillBranch('Electron_matchPdgId', electron_matchpdgid)
             self.out.fillBranch('Muon_matchPdgId', muon_matchpdgid)
+            # tau_matchpdgid = [0 for t in taus]
+            # self.out.fillBranch("Tau_matchPdgId", tau_matchpdgid)
 
         if 'provenanceConversion' in self.variables:
             electron_provenance = [self.provenanceconversion(g, genparticles) for g in electron_matches]
             muon_provenance = [self.provenanceconversion(g, genparticles) for g in muon_matches]
             self.out.fillBranch('Electron_provenanceConversion', electron_provenance)
             self.out.fillBranch('Muon_provenanceConversion', muon_provenance)
+            # tau_provenance = [0 for t in taus]
+            # self.out.fillBranch("Tau_provenanceConversion", tau_provenance)
 
         # motherPdgId
         if 'motherPdgId' in self.variables:
@@ -106,6 +115,8 @@ class LeptonGenVariablesModule(Module):
             muon_motherpdgid = [self.motherpdgid(g, genparticles) for g in muon_matches]
             self.out.fillBranch('Electron_motherPdgId', electron_motherpdgid)
             self.out.fillBranch('Muon_motherPdgId', muon_motherpdgid)
+            # tau_motherpdgid = [0 for t in taus]
+            # self.out.fillBranch("Tau_motherPdgId", tau_motherpdgid)
 
         # isChargeFlip
         if 'isChargeFlip' in self.variables:
@@ -119,6 +130,8 @@ class LeptonGenVariablesModule(Module):
                 if g.pdgId==-m.pdgId: muon_ischargeflip[i] = True
             self.out.fillBranch('Electron_isChargeFlip', electron_ischargeflip)
             self.out.fillBranch('Muon_isChargeFlip', muon_ischargeflip)
+            # tau_ischargeflip = [False for t in taus]
+            # self.out.fillBranch("Tau_isChargeFlip", tau_ischargeflip)
 
         return True
 
