@@ -32,7 +32,6 @@ parser = argparse.ArgumentParser(description='Test')
 parser.add_argument('-i', '--inputfile', required=True)
 parser.add_argument('-o', '--outputdir', required=True, type=os.path.abspath)
 parser.add_argument('-n', '--nentries', type=int, default=-1)
-parser.add_argument('-d', '--dropbranches', default=None)
 parser.add_argument('-j', '--json', default=None)
 args = parser.parse_args()
 

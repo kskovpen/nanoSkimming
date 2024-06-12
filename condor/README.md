@@ -1,10 +1,16 @@
-#Using condor submission
-Using the condor submission is very straight forward. You create a samplelist as usual, but instead of using submit.py in crabsubmission, you use the submit.py in this folder.
+# Using condor submission
+Using HTCondor for submitting skimming jobs is straightforward.
+The workflow is essentially the same as for CRAB submission,
+but instead of using `submit.py` in the `crabsubmission` folder, you use the `submit.py` in this folder.
 
 Command line example:
 ```bash
 python3 condor/submit.py -s path/to/samplelist [-p path/to/custom/processor] [-o /path/to/custom/outputfolder] [-n int] [-b int]
 ```
-Where -b are the batchsize, ie the number of nano files processed in each job in the cluster, and -n the number of events processed from each file. Every argument in square brackets is optional. The default processor is condorrun.py, but should be equivalent to crabrun.py
+Where -b is the batchsize, i.e. the number of nanoAOD files processed in each job in the cluster,
+and -n is the number of events processed from each file.
+Every argument in square brackets is optional.
+The default processor is condorrun.py, which should be equivalent to crabrun.py
 
-Next version should harmonize both maybe, oh well
+To do: the duplication of `crabrun.py` into `condorrun.py` might lead to bugs because of unnoticed divergences.
+Check if this duplication can be avoided and if a single script can be used instead.
