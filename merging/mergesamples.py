@@ -145,4 +145,5 @@ if __name__ == '__main__':
     # run the command
     if args.runmode=='local': os.system(cmd)
     elif args.runmode=='condor':
-      ct.submitCommandAsCondorJob('cjob_mergesamples', cmd, cmssw_version='auto')
+      ct.submitCommandAsCondorJob('cjob_mergesamples', cmd,
+          scriptfolder='condor_scripts', logfolder='condor_logs')

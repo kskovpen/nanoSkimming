@@ -29,9 +29,9 @@ def makeUnique(fname, scriptfolder=""):
         if not os.path.exists(os.path.join(scriptfolder, tryname)):
             return tryname
         app += 1
-    print('# ERROR #: already 2500 files named {} exist.'.format(fname))
-    print(' consider choosing more specific names, splitting in folders, etc.')
-    sys.exit()
+    msg = 'ERROR: already 2500 files named {} exist;'.format(fname)
+    msg += ' consider choosing more specific names, splitting in folders, etc.'
+    raise Exception(msg)
 
 
 def initJobScript(name, scriptfolder="", cwd=None):
@@ -42,10 +42,9 @@ def initJobScript(name, scriptfolder="", cwd=None):
     fname = os.path.join(scriptfolder, name + '.sh')
     if os.path.exists(fname):
         os.system('rm {}'.format(fname))
-    if not os.path.exists(scriptfolder):
+    if( scriptfolder is not None and scriptfolder!="" and not os.path.exists(scriptfolder) ):
         os.makedirs(scriptfolder)
-    if not cwd:
-        cwd = os.path.abspath(os.getcwd())
+    if cwd is not None: cwd = os.path.abspath(os.getcwd())
     # write script
     with open(fname, 'w') as script:
         script.write('#!/bin/bash\n')
@@ -60,47 +59,43 @@ def initJobScript(name, scriptfolder="", cwd=None):
     print('initJobScript created {}'.format(fname))
 
 
-def makeJobDescription(name, exe, argstring=None, stdout=None, stderr=None, log=None,
-                       cpus=1, mem=1024, disk=10240, jdName=None, scriptfolder=""):
+def makeJobDescription(name, exe,
+    argstring=None, stdout=None, stderr=None, log=None,
+    cpus=1, mem=1024, disk=10240, jdName=None,
+    scriptfolder="", logfolder=""):
     # create a single job description txt file
     # note: exe can for example be a runnable bash script
     # note: argstring is a single string containing the arguments to exe (space-separated)
+
     # parse arguments:
     name = os.path.splitext(name)[0]
+    if jdName: fname = jdName
+    else: fname = name + '.sub'
 
-    if jdName:
-        fname = jdName
-    else:
-        fname = name + '.sub'
-
+    # remove file with same name if it already exists
     pathToFname = os.path.join(scriptfolder, fname)
-    if os.path.exists(pathToFname):
-        os.system('rm {}'.format(pathToFname))
-    if stdout is None:
-        stdout = name + '_$(ClusterId)_$(ProcId).out'
-    if stderr is None:
-        stderr = name + '_$(ClusterId)_$(ProcId).err'
-    if log is None:
-        log = name + '_$(ClusterId)_$(ProcId).log'
-    # write file
+    if os.path.exists(pathToFname): os.system('rm {}'.format(pathToFname))
 
+    # set names of out, err and log files
+    if stdout is None: stdout = name + '_out_$(ClusterId)_$(ProcId).txt'
+    if stderr is None: stderr = name + '_err_$(ClusterId)_$(ProcId).txt'
+    if log is None: log = name + '_log_$(ClusterId)_$(ProcId).txt'
+    
+    # make directory for out, err and log files
     current_dir = os.getcwd()
-    if not os.path.exists(current_dir + '/condor_logs/'):
-        os.makedirs(current_dir + '/condor_logs/')
-        os.makedirs(current_dir + '/condor_logs/output')
-        os.makedirs(current_dir + '/condor_logs/error')
-        os.makedirs(current_dir + '/condor_logs/logs')
+    if not os.path.exists(os.path.join(current_dir, logfolder)):
+        os.makedirs(os.path.join(current_dir, logfolder))
 
+    # make job description file
     with open(pathToFname, 'w') as f:
         f.write('executable = {}\n'.format(os.path.join(scriptfolder, exe)))
-        if argstring is not None:
-            f.write('arguments = "{}"\n\n'.format(argstring))
-        f.write(f"output = {current_dir}/condor_logs/output/{stdout}\n")
-        f.write(f"error = {current_dir}/condor_logs/error/{stderr}\n")
-        f.write(f"log = {current_dir}/condor_logs/logs/{log}\n\n")
-        # f.write('request_cpus = {}\n'.format(cpus)) # Don't specify if not necessary
-        # f.write('request_memory = {}\n'.format(mem)) # Don't specify if not necessary
-        # f.write('request_disk = {}\n\n'.format(disk)) # Don't specify if not necessary
+        if argstring is not None: f.write('arguments = "{}"\n\n'.format(argstring))
+        f.write(f"output = {current_dir}/{logfolder}/{stdout}\n")
+        f.write(f"error = {current_dir}/{logfolder}/{stderr}\n")
+        f.write(f"log = {current_dir}/{logfolder}/{log}\n\n")
+        # f.write('request_cpus = {}\n'.format(cpus)) # don't specify if not necessary
+        # f.write('request_memory = {}\n'.format(mem)) # don't specify if not necessary
+        # f.write('request_disk = {}\n\n'.format(disk)) # don't specify if not necessary
         # f.write('should_transfer_files = yes\n\n')
         # (not fully sure whether to put 'yes', 'no' or omit it completely)
         # f.write('queue\n\n')
@@ -111,22 +106,28 @@ def submitCondorJob(jobDescription, addArgs="", scriptfolder=""):
     # submit a job description file as a condor job
     fname = os.path.join(scriptfolder, os.path.splitext(jobDescription)[0] + '.sub')
     if not os.path.exists(fname):
-        print('# ERROR #: job description file {} not found'.format(fname))
-        sys.exit()
+        msg = 'ERROR: job description file {} not found'.format(fname)
+        raise Exception(msg)
     # maybe later extend this part to account for failed submissions etc!
     os.system('condor_submit {} {}'.format(fname, addArgs))
 
 
-def submitCommandAsCondorJob(name, command, stdout=None, stderr=None, log=None,
-                        cpus=1, mem=1024, disk=10240, scriptfolder=""):
+def submitCommandAsCondorJob(name, command,
+    stdout=None, stderr=None, log=None,
+    cpus=1, mem=1024, disk=10240,
+    scriptfolder="", logfolder=""):
     # submit a single command as a single job
     # command is a string representing a single command (executable + args)
-    submitCommandsAsCondorJobs(name, [[command]], stdout=stdout, stderr=stderr, log=log,
-                               cpus=cpus, mem=mem, disk=disk, scriptfolder=scriptfolder)
+    submitCommandsAsCondorJobs(name, [[command]],
+                               stdout=stdout, stderr=stderr, log=log,
+                               cpus=cpus, mem=mem, disk=disk,
+                               scriptfolder=scriptfolder, logfolder=logfolder)
 
 
-def submitCommandsAsCondorCluster(name, commands, stdout=None, stderr=None, log=None,
-                                  cpus=1, mem=1024, disk=10240):
+def submitCommandsAsCondorCluster(name, commands,
+    stdout=None, stderr=None, log=None,
+    cpus=1, mem=1024, disk=10240,
+    scriptfolder="", logfolder=""):
     # run several similar commands within a single cluster of jobs
     # note: each command must have the same executable and number of args, only args can differ!
     # note: commands can be a list of commands (-> a job will be submitted for each command)
@@ -137,25 +138,26 @@ def submitCommandsAsCondorCluster(name, commands, stdout=None, stderr=None, log=
     [exe,argstring] = commands[0].split(' ',1) # exe must be the same for all commands
     nargs = len(argstring.split(' ')) # nargs must be the same for all commands
     # first make the executable
-    initJobScript(shname)
-    with open(shname,'a') as script:
+    initJobScript(shname, scriptfolder=scriptfolder)
+    with open(os.path.join(scriptfolder, shname), 'a') as script:
         script.write(exe)
         # for i in range(nargs): script.write(' ${}'.format(i+1))
         script.write(' $@')
         script.write('\n')
     # then make the job description
     # first job:
-    makeJobDescription(name, shname, argstring=argstring, stdout=stdout, stderr=stderr, log=log,
-                       cpus=cpus, mem=mem, disk=disk, jdName=jdname)
+    makeJobDescription(name, shname,
+      argstring=argstring, stdout=stdout, stderr=stderr, log=log,
+      cpus=cpus, mem=mem, disk=disk, jdName=jdname,
+      scriptfolder=scriptfolder, logfolder=logfolder)
     # add other jobs:
     with open(jdname, 'a') as script:
         for command in commands[1:]:
             [thisexe, thisargstring] = command.split(' ', 1)
             thisnargs = len(thisargstring.split(' '))
             if (thisexe != exe or thisnargs != nargs):
-                print('# ERROR #: commands are not compatible to put in same cluster')
-                return
-
+                msg = 'ERROR: commands are not compatible to put in same cluster'
+                raise Exception(msg)
             script.write('arguments = "{}"\n'.format(thisargstring))
             script.write('queue\n\n')
     # finally submit the job
@@ -163,16 +165,19 @@ def submitCommandsAsCondorCluster(name, commands, stdout=None, stderr=None, log=
 
 
 def submitCommandsAsCondorJob(name, commands, stdout=None, stderr=None, log=None,
-                              cpus=1, mem=1024, disk=10240):
+                              cpus=1, mem=1024, disk=10240,
+                              scriptfolder="", logfolder=""):
     # submit a set of commands as a single job
     # commands is a list of strings, each string represents a single command (executable + args)
     # the commands can be anything and are not necessarily same executable or same number of args.
     submitCommandsAsCondorJobs(name, [commands], stdout=stdout, stderr=stderr, log=log,
-                               cpus=cpus, mem=mem, disk=disk)
+                               cpus=cpus, mem=mem, disk=disk,
+                               scriptfolder=scriptfolder, logfolder=logfolder)
 
 
 def submitCommandsAsCondorJobs(name, commands, stdout=None, stderr=None, log=None,
-                               cpus=1, mem=1024, disk=10240, scriptfolder=""):
+                               cpus=1, mem=1024, disk=10240,
+                               scriptfolder="", logfolder=""):
     # submit multiple sets of commands as jobs (one job per set)
     # commands is a list of lists of strings, each string represents a single command
     # the commands can be anything and are not necessarily same executable or number of args.
@@ -188,7 +193,8 @@ def submitCommandsAsCondorJobs(name, commands, stdout=None, stderr=None, log=Non
                 script.write(cmd + '\n')
         # then make the job description
         makeJobDescription(name,shname,stdout=stdout,stderr=stderr,log=log,
-                           cpus=cpus,mem=mem,disk=disk,jdName=jdname, scriptfolder=scriptfolder)
+                           cpus=cpus,mem=mem,disk=disk,jdName=jdname,
+                           scriptfolder=scriptfolder, logfolder=logfolder)
         with open(os.path.join(scriptfolder, jdname), 'a') as jdScript:
             jdScript.write('queue\n\n')
 
@@ -196,9 +202,11 @@ def submitCommandsAsCondorJobs(name, commands, stdout=None, stderr=None, log=Non
         submitCondorJob(jdname, addArgs='-batch-name "{}"'.format(name), scriptfolder=scriptfolder)
 
 
-def submitCommandsetsAsCondorCluster(name, commands, stdout=None, stderr=None, log=None,
-                                     cpus=1, mem=1024, disk=10240, scriptfolder="", cwd=None):
-    # submit multiple sets of commands as one cluster (one job of the clusterper set)
+def submitCommandsetsAsCondorCluster(name, commands, 
+    stdout=None, stderr=None, log=None,
+    cpus=1, mem=1024, disk=10240,
+    scriptfolder="", logfolder="", cwd=None):
+    # submit multiple sets of commands as one cluster (one job of the cluster per set)
     # commands is a list of lists of strings, each string represents a single command
     # the commands can be anything and are not necessarily same executable or number of args.
     # parse arguments
@@ -206,8 +214,7 @@ def submitCommandsetsAsCondorCluster(name, commands, stdout=None, stderr=None, l
     shname = makeUnique(name + '.sh', scriptfolder)
     jdname = makeUnique(name + '.sub', scriptfolder)
     # first make the executable
-    print(shname)
-    initJobScript(shname, scriptfolder, cwd=cwd)
+    initJobScript(shname, scriptfolder=scriptfolder, cwd=cwd)
     with open(os.path.join(scriptfolder, shname), 'a') as script:
         for i, commandset in enumerate(commands):
             script.write(f"if [ $1 -eq {i} ]; then\n")
@@ -218,30 +225,18 @@ def submitCommandsetsAsCondorCluster(name, commands, stdout=None, stderr=None, l
     # then make the job description
     # first job:
     makeJobDescription(name, shname, stdout=stdout, stderr=stderr, log=log,
-                       cpus=cpus, mem=mem, disk=disk, jdName=jdname, scriptfolder=scriptfolder)
+                       cpus=cpus, mem=mem, disk=disk, jdName=jdname,
+                       scriptfolder=scriptfolder, logfolder=logfolder)
 
     with open(os.path.join(scriptfolder, jdname), 'a') as jdScript:
         jdScript.write("arguments = $(ProcId)\n")
         jdScript.write(f'queue {len(commands)}\n\n')
 
-        # for commandset in commands[1:]:
-        #     # parse arguments
-        #     name = os.path.splitext(name)[0]
-        #     shname = makeUnique(name + '.sh', scriptfolder=scriptfolder)
-        #     # first make the executable
-        #     initJobScript(shname, scriptfolder)
-        #     with open(os.path.join(scriptfolder, shname), 'a') as script:
-        #         for cmd in commandset:
-        #             script.write(cmd + '\n')
-        #     # then make the job description
-        #     jdScript.write('executable = {}\n'.format(os.path.join(scriptfolder, shname)))
-        #     jdScript.write('queue\n\n')
     # finally submit the job
     submitCondorJob(jdname, addArgs='-batch-name "{}"'.format(name), scriptfolder=scriptfolder)
 
 
 def submitScriptAsCondorJob(scriptName):
     jdName = os.path.splitext(scriptName)[0]
-
     makeJobDescription(scriptName, scriptName)
     submitCondorJob(scriptName)
