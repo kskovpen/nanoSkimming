@@ -25,12 +25,8 @@ from PhysicsTools.nanoSkimming.tools.sampletools import getsampleparams
 parser = argparse.ArgumentParser(description='Submission through HTCondor')
 parser.add_argument('-i', '--inputfile', required=True)
 parser.add_argument('-n', '--nentries', type=int, default=-1)
-<<<<<<< Updated upstream
-parser.add_argument('-d', '--dropbranches', default='data/dropbranches/fourtops.txt')
-# parser.add_argument('-j', '--json', default=None)
-=======
 parser.add_argument('-d', '--dropbranches', default='../data/dropbranches/fourtops.txt')
->>>>>>> Stashed changes
+# parser.add_argument('-j', '--json', default=None)
 args = parser.parse_args()
 
 # print arguments
@@ -52,8 +48,12 @@ outputdir = os.getenv('TMPDIR')
 sampleparams = getsampleparams(inputfile)
 year = sampleparams['year']
 dtype = sampleparams['dtype']
-runperiod = sampleparams['runperiod']
-print('Sample is found to be {} {} era {}.'.format(year,dtype, runperiod))
+campaign = sampleparams['campaign']
+runperiod = None
+if dtype=='data': runperiod = sampleparams['runperiod']
+msg = 'Sample is found to be {} {} {}.'.format(campaign, year, dtype)
+if dtype=='data': msg = msg[:-1] + ' (era {}).'.format(runperiod)
+print(msg)
 
 # define json preskim
 jsonfile = None
@@ -85,7 +85,7 @@ if year=='2018':
 JetMetCorrector = jme.createJMECorrector(
     isMC=(dtype=='sim'),
     dataYear=yeardict[year],
-    runPeriod=runperiod,
+    runPeriod=runperiod if runperiod is not None else "B",
     jesUncert="Merged",
     applyHEMfix=applyhemFix,
     splitJER=True
