@@ -26,7 +26,7 @@ from PhysicsTools.nanoSkimming.tools.sampletools import getsampleparams
 # read command line arguments
 parser = argparse.ArgumentParser(description='Submit via CRAB')
 parser.add_argument('-n', '--nentries', default=-1, type=int)
-args = parser.parse_args()
+args, unknown = parser.parse_known_args()
 
 # print arguments
 print('Running with following configuration:')
@@ -72,10 +72,10 @@ if dtype=='data':
         raise Exception('ERROR: json file not found.')
 
 # define branches to drop and keep
-dropbranches = '../data/dropbranches/default.txt'
+dropbranches = '../data/dropbranches/fourtops.txt'
 if not os.path.exists(dropbranches):
     # for CRAB submission, the data directory is copied to the working directory
-    dropbranches = 'data/dropbranches/default.txt'
+    dropbranches = 'data/dropbranches/fourtops.txt'
 if not os.path.exists(dropbranches):
     raise Exception('ERROR: dropbranches file not found.')
 

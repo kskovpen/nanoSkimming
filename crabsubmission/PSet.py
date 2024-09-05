@@ -30,8 +30,10 @@ process.source.fileNames = [
     'file:///pnfs/iihe/cms/store/user/llambrec/nanoaod/TTWJetsToLNu-RunIISummer20UL18-nanoAOD-fullfile.root'
 ]
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
-process.options.numberOfThreads=cms.untracked.uint32(1)
-process.options.numberOfStreams=cms.untracked.uint32(1)
+# process.options.numberOfThreads=cms.untracked.uint32(1)
+# process.options.numberOfStreams=cms.untracked.uint32(1)
+process.options   = cms.untracked.PSet(numberOfStreams = cms.untracked.uint32(1), numberOfThreads = cms.untracked.uint32(1))
+
 process.output = cms.OutputModule("PoolOutputModule",
   fileName = cms.untracked.string('skimmed.root'))
 process.out = cms.EndPath(process.output)

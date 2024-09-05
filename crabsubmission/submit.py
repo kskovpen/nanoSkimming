@@ -4,11 +4,11 @@
 import sys
 import os
 import argparse
-from pathlib import Path
+# from pathlib import Path
 from multiprocessing import Process
 
 # import local tools
-sys.path.append(str(Path(__file__).parents[1]))
+# sys.path.append(str(Path(__file__).parents[1]))
 from PhysicsTools.nanoSkimming.tools.sampletools import getsampleparams
 
 def hascmsenv():
@@ -27,7 +27,7 @@ def writesh(shname, processor, argstr=''):
         # on the worker node, irrespective of its full path here (?).
         # (this is done by the setting config.JobType.inputFiles = [processor])
         pbase = os.path.basename(processor)
-        f.write('python3 {} {}\n'.format(processor, argstr))
+        f.write('python {} $1 {}\n'.format(processor, argstr))
 
 
 if __name__=='__main__':
@@ -74,6 +74,7 @@ if __name__=='__main__':
     shname = os.path.splitext(args.processor)[0]+'.sh'
     argstr = ''
     if args.nentries > 0: argstr += '--nentries {}'.format(args.nentries)
+    else: argstr += '--nentries {}'.format(args.nentries)
     writesh(shname, args.processor, argstr=argstr)
 
     # loop over datasets
