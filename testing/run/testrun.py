@@ -33,6 +33,7 @@ parser.add_argument('-i', '--inputfile', required=True)
 parser.add_argument('-o', '--outputdir', required=True, type=os.path.abspath)
 parser.add_argument('-n', '--nentries', type=int, default=-1)
 parser.add_argument('-j', '--json', default=None)
+parser.add_argument('-d', '--dropbranches', default=None)
 args = parser.parse_args()
 
 # parse input file
@@ -64,14 +65,6 @@ JetMetCorrector = jme.createJMECorrector(
   splitJER=False
 )
 
-# define branches to drop and keep
-dropbranches = '../data/dropbranches/default.txt'
-if not os.path.exists(dropbranches):
-    # for CRAB submission, the data directory is copied to the working directory
-    dropbranches = 'data/dropbranches/default.txt'
-if not os.path.exists(dropbranches):
-    raise Exception('ERROR: dropbranches file not found.')
-
 # define modules
 modules = ([
   nLightLeptonSkimmer(2,
@@ -97,7 +90,7 @@ p = PostProcessor(
   modules = modules,
   maxEntries = None if args.nentries < 0 else args.nentries,
   postfix = postfix,
-  branchsel = dropbranches,
+  branchsel = args.dropbranches,
   jsonInput = args.json
 )
 

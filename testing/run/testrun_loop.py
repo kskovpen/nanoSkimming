@@ -10,7 +10,7 @@ import os
 nentries = 1000
 redirector = 'root://cms-xrd-global.cern.ch//'
 outputdir = 'output_test'
-dropbranches = '../data/dropbranches/default.txt'
+dropbranches = '../../data/dropbranches/default.txt'
 dosim2016pre = False
 dosim2016post = False
 dosim2017 = False
@@ -50,7 +50,7 @@ inputfiles = [redirector+f for f in inputfiles]
 # loop over input files
 for f in inputfiles:
     # make the command
-    cmd = 'python3 testrun.py'
+    cmd = 'python testrun.py'
     cmd += ' -i {}'.format(f)
     cmd += ' -o {}'.format(outputdir)
     cmd += ' -n {}'.format(nentries)
