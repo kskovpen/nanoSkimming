@@ -1,4 +1,4 @@
-#!/bin/env python3
+#!/usr/bin/env python3
 
 ##############################################################
 # monitor crab jobs and put the results in a summary webpage #
@@ -41,7 +41,7 @@ import os, sys, glob, subprocess, pexpect, json
 from datetime import datetime
 import argparse
 
-def style():
+def define_css_style():
     ### define a fixed style string for the web page
     # only meant for internal use in web function
 
@@ -76,27 +76,57 @@ def style():
 
     s += '.divide tr td { width:60%; }\n'
 
-    s += '#progress {\n'
-    s += 'width: 500px;\n'
+    # define style for progress bar, consisting of:
+    # - "progress-container": the container for both the colored bars and text
+    # - "progress-text": container for text overlaying the colored bars
+    # - "progress-bar": the colored bar
+
+    s += '.progress-container {\n'
+    s += 'width: 100%;\n'
+    s += 'height: 20px;\n'
     s += 'border: 1px solid black;\n'
     s += 'position: relative;\n'
     s += 'padding: 3px;\n'
     s += '}\n'
 
-    s += '#percent {\n'
+    s += '.progress-text {\n'
     s += 'position: absolute;\n'
-    s += 'left: 10%;\n'
+    s += 'left: 5%;\n'
     s += '}\n'
 
-    s += '#bar {\n'
+    s += '.progress-bar {\n'
+    s += 'position: absolute;\n'
     s += 'height: 20px;\n'
-    s += 'background-color: green;\n'
-    s += 'width: 30%;\n'
     s += '}\n'
 
     s += '</style>\n'
 
     return s
+
+
+def make_progress_bar(progress_values):
+    ### make html progress bar
+    # input arguments:
+    # - progress_values: a dict matching status names to percentages in str format,
+    #   e.g. {'finished': '100%'}
+    progress_str = ' '.join(['{}: {}'.format(key, val) for key, val in progress_values.items()])
+    colors = {
+      'finished': 'lightgreen',
+      'transferring': 'turquoise',
+      'running': 'deepskyblue',
+      'failed': 'crimson'
+    }
+    html = '<td> <div class="progress-container">'
+    cumul = 0
+    for status, color in colors.items():
+        if status not in progress_values.keys(): continue
+        val = float(progress_values[status].strip('%'))
+        stylestr = 'left: {}%; width: {}%; background-color: {}'.format(cumul, val, color)
+        html += '<div class="progress-bar" style="{}"></div>'.format(stylestr)
+        cumul += val
+    html += '<div class="progress-text">'+progress_str+'</div>'
+    html += '</div></td>'
+    return html
 
 
 def web( data, webpath, force=False ):
@@ -124,7 +154,7 @@ def web( data, webpath, force=False ):
 
     # make the page layout and header
     page = '<html>\n'
-    page += '<head>\n'+style()+'</head>\n'
+    page += '<head>\n'+define_css_style()+'</head>\n'
     page += '<body>\n'
     page += '<table style="background-color:#2C3E50;color:#EAECEE;'
     page += 'font-size:40px;width:100%;text-align: center;">'
@@ -162,11 +192,11 @@ def web( data, webpath, force=False ):
 
         # format sample name
         sampleparts = sample.split('/')
-        samplename = sampleparts[0]
+        samplename = sampleparts[1]
         sampleshortname = samplename.split('_')[0]
-        versionname = sampleparts[1]
-        versionshortname = versionname.split('-')[0]
-        production = sampleparts[2]
+        versionname = sampleparts[2]
+        versionshortname = versionname.replace('crab_','').split('-')[0]
+        production = sampleparts[0]
 
         # get the grafana link for this sample
         sample_grafana = ''
@@ -177,8 +207,12 @@ def web( data, webpath, force=False ):
         sample_status = sampledata[sample]['status']
         status_str = ', '.join('{}: {}'.format(key,val) 
             for key,val in sorted(sample_status.items()))
-        finished_fraction = '0%'
-        if 'finished' in sample_status.keys(): finished_fraction = sample_status['finished']
+        finished_fraction = 0
+        transferring_fraction = 0
+        running_fraction = 0
+        if 'finished' in sample_status.keys(): finished_fraction = float(sample_status['finished'].strip('%'))
+        if 'transferring' in sample_status.keys(): transferring_fraction = float(sample_status['transferring'].strip('%'))
+        if 'running' in sample_status.keys(): running_fraction = float(sample_status['running'].strip('%'))
 
         # special case for old submissions (status no longer retrievable):
         # avoid overwriting by 'finished 0%'.
@@ -186,7 +220,8 @@ def web( data, webpath, force=False ):
             if( len(sample_status)==1
                 and 'finished' in sample_status.keys()
                 and finished_fraction == '0%' ):
-                msg = 'ERROR: the status for this sample seems to be irretrievable,'
+                msg = 'ERROR: the status for the sample '+samplename
+                msg += ' seems to be irretrievable,'
                 msg += ' perhaps the submission is too long ago?'
                 msg += ' Will not update the webpage to avoid overwriting useful information.'
                 raise Exception(msg)
@@ -194,13 +229,14 @@ def web( data, webpath, force=False ):
         # format the webpage entry
         page += '<table class="divide" cellpadding="5px" cellspacing="0">\n'
         page += '<tr>\n'
-        page += '<td>'+sampleshortname+'</td>'
-        page += '<td>'+versionshortname+'</td>'
-        page += '<td> <div id="progress">'
-        page += '<div id="percent" style="width=100%">'+status_str+'</div>'
-        page += '<div id="bar" style="width:'+finished_fraction+'"></div>'
-        page += '</div></td>'
-        page += '<td> <a href="'+sample_grafana+'" target="_blank">Grafana</a> </td>\n'
+        # sample name
+        page += '<td style="width:20%">'+sampleshortname+'</td>'
+        # version name
+        page += '<td style="width:20%">'+versionshortname+'</td>'
+        # progress bar and text
+        page += make_progress_bar(sample_status)
+        # grafana link
+        page += '<td style="width:20%"> <a href="'+sample_grafana+'" target="_blank">Grafana</a> </td>\n'
         page += '</tr>\n'
 
     page += '</table>\n'    
@@ -228,6 +264,8 @@ if __name__ == '__main__':
       help='Run in test mode, process only a few samples (default: False)')
     parser.add_argument('-f', '--force', default=False, action='store_true',
       help='Write web page even if the info for some samples could not be retrieved')
+    parser.add_argument('--printraw', default=False, action='store_true',
+      help='Print raw output of crab status command.')
     args = parser.parse_args()
 
     # print arguments
@@ -265,7 +303,7 @@ if __name__ == '__main__':
 
     # move to crab directory and find all sample folders
     os.chdir(args.crabdir)
-    fproc = glob.glob('*/*/*')
+    fproc = sorted(glob.glob('*/*/*'))
     nfproc = len(fproc)
 
     # only for testing: subselect samples
@@ -288,7 +326,9 @@ if __name__ == '__main__':
         success = False
         attempt = 0
         while (attempt<5 and not success):
-            ch = pexpect.spawn('crab status -d '+f, encoding='utf-8')
+            cmd = 'crab status -d '+f
+            if args.printraw: cmd += '  --verbose'
+            ch = pexpect.spawn(cmd, encoding='utf-8')
             ch.timeout = 180 # in seconds, put large enough so the process finishes before limit
             ch.logfile = open(templogfile, 'w')
             passpindex = ch.expect(passp)
@@ -315,6 +355,10 @@ if __name__ == '__main__':
    
         # remove the log file
         os.system('rm {}'.format(templogfile))
+
+        # print contents of log file
+        if args.printraw:
+            for line in outlines: print(line.strip('\n'))
 
         # parse the text from the log file
         for line in outlines:
@@ -360,6 +404,9 @@ if __name__ == '__main__':
         # handle case where job is complete
         if statuscompleted:
             print('This task is completed.')
+
+        # print separator
+        print('\n----------------------------\n')
 
     # make web interface for gathered completion data              
     os.chdir(wdir)

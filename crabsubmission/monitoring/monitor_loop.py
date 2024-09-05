@@ -68,14 +68,11 @@ if __name__=='__main__':
     if args.resubmit: cmd += ' --resubmit'
     cmd += ' --webpage {}'.format(args.webpage)
 
-    # loop over number of iterations minus 1
+    # loop
     idx = 0
-    while idx < args.niterations-1:
+    while idx < args.niterations:
         os.system(cmd)
         sys.stdout.flush()
         sys.stderr.flush()
         time.sleep(args.tsleep)
         idx += 1
-    # run last iteration 
-    # (without waiting time after finishing)
-    os.system(cmd)
