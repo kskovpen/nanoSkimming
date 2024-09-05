@@ -56,7 +56,7 @@ config.JobType.outputFiles             = ['skimmed.root']
 #  this argument can in principle also be left out altogether as PSet.py
 #  already specifies the output file name.)
 config.JobType.sendExternalFolder      = True
-config.JobType.sendPythonFolder        = True
+# config.JobType.sendPythonFolder        = True
 config.JobType.allowUndistributedCMSSW = True
 config.JobType.numCores                = 1
 config.JobType.maxJobRuntimeMin        = 1315 if 'SIM' in dataset else 2630
