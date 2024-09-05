@@ -47,8 +47,12 @@ outputdir = '.'
 sampleparams = getsampleparams(inputfiles[0])
 year = sampleparams['year']
 dtype = sampleparams['dtype']
-runperiod = sampleparams['runperiod']
-print('Sample is found to be {} {} era {}.'.format(year,dtype, runperiod))
+campaign = sampleparams['campaign']
+runperiod = None
+if dtype=='data': runperiod = sampleparams['runperiod']
+msg = 'Sample is found to be {} {} {}.'.format(campaign, year, dtype)
+if dtype=='data': msg = msg[:-1] + ' (era {}).'.format(runperiod)
+print(msg)
 
 # set other parameters
 jobreport = True
@@ -72,10 +76,10 @@ if dtype=='data':
         raise Exception('ERROR: json file not found.')
 
 # define branches to drop and keep
-dropbranches = '../data/dropbranches/fourtops.txt'
+dropbranches = '../data/dropbranches/hhto4b.txt'
 if not os.path.exists(dropbranches):
     # for CRAB submission, the data directory is copied to the working directory
-    dropbranches = 'data/dropbranches/fourtops.txt'
+    dropbranches = 'data/dropbranches/hhto4b.txt'
 if not os.path.exists(dropbranches):
     raise Exception('ERROR: dropbranches file not found.')
 
@@ -92,7 +96,7 @@ if year=='2018':
 JetMetCorrector = jme.createJMECorrector(
     isMC=(dtype=='sim'),
     dataYear=yeardict[year],
-    runPeriod=runperiod,
+    runPeriod=runperiod if runperiod is not None else "B",
     jesUncert="Merged",
     applyHEMfix=applyhemFix,
     splitJER=True
@@ -112,15 +116,16 @@ muonCorrector = muoncorr.muonScaleResProducer(
 )
 
 # define modules
-leptonmodule = None
-if dtype=='data':
-    leptonmodule = nLightLeptonSkimmer(2,
-        electron_selection_id='run2ul_loose',
-        muon_selection_id='run2ul_loose')
-else:
-    leptonmodule = MultiLightLeptonSkimmer(
-        electron_selection_id='run2ul_loose',
-        muon_selection_id='run2ul_loose')
+
+leptonmodule = None # no skim on leptons needed
+#if dtype=='data':
+#    leptonmodule = nLightLeptonSkimmer(2,
+#        electron_selection_id='run2ul_loose',
+#        muon_selection_id='run2ul_loose')
+#else:
+#    leptonmodule = MultiLightLeptonSkimmer(
+#        electron_selection_id='run2ul_loose',
+#        muon_selection_id='run2ul_loose')
 
 year_simple = year
 if "2016" in year_simple:
@@ -130,9 +135,9 @@ modules = ([])
 if dtype != "data":
     modules = ([PSWeightSumModule()])
 modules += ([
-    leptonmodule,
+    #leptonmodule, # no skim on leptons needed
     LeptonVariablesModule(),
-    TopLeptonMvaModule(year, 'ULv1'),
+    #TopLeptonMvaModule(year, 'ULv1'), # lepton mva not needed
     TriggerVariablesModule(year_simple),
     JetMetCorrector(),
     muonCorrector

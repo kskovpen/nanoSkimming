@@ -27,7 +27,8 @@ process.source = cms.Source("PoolSource",
 )
 process.source.fileNames = [
     #'root://xrootd-cms.infn.it///store/mc/RunIISummer20UL18NanoAODv9/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/270000/0BF1CAC0-066F-6C41-89EF-6F7B67A8E1D7.root'
-    'file:///pnfs/iihe/cms/store/user/llambrec/nanoaod/TTWJetsToLNu-RunIISummer20UL18-nanoAOD-fullfile.root'
+    #'file:///pnfs/iihe/cms/store/user/llambrec/nanoaod/TTWJetsToLNu-RunIISummer20UL18-nanoAOD-fullfile.root'
+    'root://xrootd-cms.infn.it///store/mc/RunIIAutumn18NanoAODv7/GluGluToHHTo4B_node_cHHH1_TuneCP5_PSWeights_13TeV-powheg-pythia8/NANOAODSIM/Nano02Apr2020_102X_upgrade2018_realistic_v21-v1/100000/891692F9-4E77-BC41-9862-771A2307FAE4.root'
 ]
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
 # process.options.numberOfThreads=cms.untracked.uint32(1)
