@@ -40,6 +40,9 @@ class TopLeptonMvaModule(Module):
         self.electronvarname = 'Electron_{}'.format(variablename)
         self.muonvarname = 'Muon_{}'.format(variablename)
 
+        # use Run 2 weights for Run 3
+        if '202' in year: year = '2018'
+        
         # check arguments
         if year not in ['2016PreVFP','2016PostVFP','2017','2018']:
             msg = 'ERROR in TopLeptonMvaModule:'
@@ -110,7 +113,8 @@ class TopLeptonMvaModule(Module):
 	    electron.sip3d,
 	    np.log(abs(electron.dxy)),
 	    np.log(abs(electron.dz)),
-            electron.mvaFall17V2noIso,
+            electron.mvaNoIso,
+#            electron.mvaFall17V2noIso,
         ]])
         if self.version=='ULv2': features[0].append( electron.lostHits )
         features = np.array(features)
